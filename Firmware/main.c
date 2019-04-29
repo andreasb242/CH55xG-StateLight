@@ -1,10 +1,3 @@
-/********************************** (C) COPYRIGHT *******************************
-* File Name          : CDC.C
-* Author             : WCH
-* Version            : V1.0
-* Date               : 2017/03/01
-* Description        : CH554做CDC设备转串口，选择串口1
-*******************************************************************************/
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -13,9 +6,14 @@
 #include <ch554_usb.h>
 #include <debug.h>
 
-__xdata __at (0x0000) uint8_t  Ep0Buffer[DEFAULT_ENDP0_SIZE];       //端点0 OUT&IN缓冲区，必须是偶地址
-__xdata __at (0x0040) uint8_t  Ep1Buffer[DEFAULT_ENDP1_SIZE];       //端点1上传缓冲区
-__xdata __at (0x0080) uint8_t  Ep2Buffer[2*MAX_PACKET_SIZE];        //端点2 IN & OUT缓冲区,必须是偶地址
+// Endpoint 0 OUT&IN buffer, must be an even address
+__xdata __at (0x0000) uint8_t  Ep0Buffer[DEFAULT_ENDP0_SIZE];
+
+// Endpoint 1 upload buffer
+__xdata __at (0x0040) uint8_t  Ep1Buffer[DEFAULT_ENDP1_SIZE];
+
+// Endpoint 2 IN & OUT buffer, must be an even address
+__xdata __at (0x0080) uint8_t  Ep2Buffer[2*MAX_PACKET_SIZE];
 
 uint16_t SetupLen;
 uint8_t   SetupReq,Count,UsbConfig;
