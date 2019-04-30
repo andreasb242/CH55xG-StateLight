@@ -1,4 +1,4 @@
-TARGET = usb_device_cdc
+TARGET = StateLight
 
 # Adjust the XRAM location and size to leave space for the USB DMA buffers
 # Buffer layout in XRAM:
@@ -11,6 +11,7 @@ XRAM_SIZE = 0x0300
 XRAM_LOC = 0x0100
 
 C_FILES = \
+	../logic.c \
 	../main.c \
 	../framework/include/debug.c
 
