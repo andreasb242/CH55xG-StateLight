@@ -14,6 +14,7 @@
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="org.eclipse.cdt.core.pathentry">
 		<pathentry include="/usr/share/sdcc/include" kind="inc" path="" system="true"/>
+		<pathentry kind="mac" name="IDE_ENVIRONMENT" path="" value=""/>
 		<pathentry kind="src" path=""/>
 		<pathentry kind="out" path="build"/>
 	</storageModule>

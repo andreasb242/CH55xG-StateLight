@@ -13,6 +13,7 @@ XRAM_LOC = 0x0100
 C_FILES = \
 	../logic.c \
 	../main.c \
+	../usb-setup.c \
 	../framework/include/debug.c
 
 pre-flash:

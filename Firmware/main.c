@@ -3,7 +3,7 @@
  *
  * USB Serial controller to switch WS2812b LEDs
  *
- * Andreas Butt, (c) 2019
+ * Andreas Butti, (c) 2019
  * License: GPL
  */
 
