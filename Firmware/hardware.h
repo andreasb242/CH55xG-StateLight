@@ -23,3 +23,8 @@ void USBDeviceEndPointCfg();
  * USB device mode interrupt initialization
  */
 void USBDeviceIntCfg();
+
+/**
+ * Print string to Serial 0
+ */
+void print(const char* str);

@@ -41,7 +41,7 @@ void USBDeviceCfg() {
 
 /**
  * Enable USB Endpoint
- */
+ * /
 void USBDeviceEndPointCfg() {
 	// Endpoint 1 sends the data transfer address
 	UEP1_DMA = (uint16_t) Ep1Buffer;
@@ -70,7 +70,7 @@ void USBDeviceEndPointCfg() {
 
 /**
  * USB device mode interrupt initialization
- */
+ * /
 void USBDeviceIntCfg() {
 	// Enable device hang interrupt
 	USB_INT_EN |= bUIE_SUSPEND;
@@ -90,4 +90,15 @@ void USBDeviceIntCfg() {
 	// Allow microcontroller interrupt
 	EA = 1;
 }
+*/
 
+
+/**
+ * Print string to Serial 0
+ */
+void print(const char* str) {
+	while(*str) {
+		CH554UART0SendByte(*str);
+		str++;
+	}
+}

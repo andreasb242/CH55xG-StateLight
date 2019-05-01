@@ -14,6 +14,9 @@
 #include <ch554_usb.h>
 #include <debug.h>
 
+#include <8051.h>
+
+
 // Ignore some defines for the IDE,
 // make sure this is defined in your IDE,
 // but not in the makefile, so this is

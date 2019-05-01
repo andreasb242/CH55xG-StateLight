@@ -12,8 +12,8 @@ XRAM_LOC = 0x0100
 
 C_FILES = \
 	../hardware.c \
+	../i2c.c \
 	../main.c \
-	../usb-cdc2.c \
 	../framework/include/debug.c
 
 pre-flash:
