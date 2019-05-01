@@ -11,9 +11,9 @@ XRAM_SIZE = 0x0300
 XRAM_LOC = 0x0100
 
 C_FILES = \
-	../hardware.c \
+	../logic.c \
 	../main.c \
-	../usb-cdc2.c \
+	../usb-setup.c \
 	../framework/include/debug.c
 
 pre-flash:

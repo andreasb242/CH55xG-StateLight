@@ -1,16 +1,19 @@
 /**
- * USB CDC controlled W2812b LEDs
+ * State light main
+ *
+ * USB Serial controller to switch WS2812b LEDs
  *
  * Andreas Butti, (c) 2019
  * License: GPL
  */
 
-#include "inc.h"
-#include "usb-cdc.h"
-#include "hardware.h"
+#include "logic.h"
+
+#include <debug.h>
+
 
 /**
- * Programm main
+ * Firmware main
  */
 void main() {
 	// CH55x clock selection configuration
@@ -39,8 +42,6 @@ void main() {
 	// Pre-use send length must be cleared
 	UEP2_T_LEN = 0;
 
-	// Main loop
-	while (1) {
-		usbCdcLoop();
-	}
+	// Main Loop
+	mainLoop();
 }
