@@ -29,6 +29,8 @@
 #define __interrupt(x)
 #endif
 
+#define PRINT_DBG(str) print(str "\r\n")
+
 /**
  * USB device mode configuration
  */
