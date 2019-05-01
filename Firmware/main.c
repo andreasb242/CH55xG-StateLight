@@ -8,6 +8,7 @@
 #include "inc.h"
 #include "hardware.h"
 #include "bitbang.h"
+#include "logic.h"
 
 uint16_t SetupLen;
 uint8_t   SetupReq,Count,UsbConfig;
@@ -537,7 +538,7 @@ void uart_poll()
 	{
 		uart_data = Ep2Buffer[USBBufOutPoint++];
 
-		CH554UART0SendByte(uart_data);
+		processCommandByte(uart_data);
 
 		USBByteCount--;
 
@@ -545,16 +546,6 @@ void uart_poll()
 			UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_ACK;
 	}
 }
-
-
-
-
-
-#define LED_COUNT (3)
-__xdata uint8_t led_data[LED_COUNT * 3] = {0xff, 0, 0,
-0, 0xff, 0,
-0, 0, 0xff};
-
 
 /**
  * Firmware main
@@ -606,10 +597,10 @@ void main() {
 		usb_poll();
 	    P3_2 = 0;
 
-		v_uart_puts("test1\r\n");
+//		v_uart_puts("test1\r\n");
 		uart_poll();
 
-        bitbangWs2812(LED_COUNT, led_data);
+		logicLoop();
 	}
 }
 

@@ -29,7 +29,8 @@
 #define __interrupt(x)
 #endif
 
-#define PRINT_DBG(str) print(str "\r\n")
+//#define PRINT_DBG(str) print(str "\r\n")
+#define PRINT_DBG(str)
 
 /**
  * USB device mode configuration
@@ -50,3 +51,6 @@ void mainLoop();
  * USB device mode interrupt initialization
  */
 void USBDeviceIntCfg();
+
+// TODO Move to other file
+void v_uart_puts(char *str);

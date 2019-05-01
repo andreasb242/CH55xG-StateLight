@@ -13,6 +13,7 @@ XRAM_LOC = 0x0100
 C_FILES = \
 	../bitbang.c \
 	../hardware.c \
+	../logic.c \
 	../main.c \
 	../framework/include/debug.c
 
