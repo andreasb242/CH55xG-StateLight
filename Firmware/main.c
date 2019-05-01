@@ -8,8 +8,6 @@
 #include "inc.h"
 #include "hardware.h"
 
-#include "i2c.h"
-
 uint16_t SetupLen;
 uint8_t   SetupReq,Count,UsbConfig;
 const uint8_t *  pDescr;			//USB配置标志
@@ -533,13 +531,6 @@ void usb_poll()
 void uart_poll()
 {/* 串口 处理程序 */
 	uint8_t uart_data;
-	bool i2c_ack = 0;
-	static uint8_t i2c_frame_len = 0;
-	static uint8_t i2c_frame_rx_len = 0;
-	static uint8_t i2c_error_no = 0;
-	static uint8_t uart_rx_status = 0;
-	static uint8_t dontstop = 0;
-	uint8_t i;
 	
 	if(USBByteCount)   //USB接收端点有数据
 	{
@@ -568,9 +559,6 @@ void main() {
 
 	// Serial port 0, can be used for debugging
 	mInitSTDIO();
-
-	// TODO Remove i2C
-	i2c_init();
 
 	// Enable USB Port
 	USBDeviceCfg();

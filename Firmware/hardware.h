@@ -11,7 +11,9 @@
 
 // USB BUFFER -----------------------------------------------------------------
 
+#undef DEFAULT_ENDP0_SIZE
 #define DEFAULT_ENDP0_SIZE	64
+#undef DEFAULT_ENDP1_SIZE
 #define DEFAULT_ENDP1_SIZE	64
 
 // Endpoint 0 OUT & IN buffer, must be an even address

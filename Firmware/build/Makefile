@@ -12,7 +12,6 @@ XRAM_LOC = 0x0100
 
 C_FILES = \
 	../hardware.c \
-	../i2c.c \
 	../main.c \
 	../framework/include/debug.c
 
