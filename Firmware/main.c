@@ -8,16 +8,7 @@
 #include "inc.h"
 #include "hardware.h"
 
-
-#define DEFAULT_ENDP0_SIZE	64
-#define DEFAULT_ENDP1_SIZE	64
-
 #include "i2c.h"
-
-
-__xdata __at (0x0000) uint8_t  Ep0Buffer[DEFAULT_ENDP0_SIZE];	//端点0 OUT&IN缓冲区，必须是偶地址
-__xdata __at (0x0040) uint8_t  Ep1Buffer[DEFAULT_ENDP1_SIZE];	//端点1上传缓冲区
-__xdata __at (0x0080) uint8_t  Ep2Buffer[2*MAX_PACKET_SIZE];	//端点2 IN & OUT缓冲区,必须是偶地址
 
 uint16_t SetupLen;
 uint8_t   SetupReq,Count,UsbConfig;
@@ -107,43 +98,6 @@ void jump_to_bootloader()
 }
 
 
-
-/*******************************************************************************
-* Function Name  : USBDeviceIntCfg()
-* Description	: USB设备模式中断初始化
-* Input		  : None
-* Output		 : None
-* Return		 : None
-*******************************************************************************/
-void USBDeviceIntCfg()
-{
-	USB_INT_EN |= bUIE_SUSPEND;											   //使能设备挂起中断
-	USB_INT_EN |= bUIE_TRANSFER;											  //使能USB传输完成中断
-	USB_INT_EN |= bUIE_BUS_RST;											   //使能设备模式USB总线复位中断
-	USB_INT_FG |= 0x1F;													   //清中断标志
-	IE_USB = 1;															   //使能USB中断
-	EA = 1;																   //允许单片机中断
-}
-/*******************************************************************************
-* Function Name  : USBDeviceEndPointCfg()
-* Description	: USB设备模式端点配置，模拟兼容HID设备，除了端点0的控制传输，还包括端点2批量上下传
-* Input		  : None
-* Output		 : None
-* Return		 : None
-*******************************************************************************/
-void USBDeviceEndPointCfg()
-{
-	// TODO: Is casting the right thing here? What about endianness?
-	UEP1_DMA = (uint16_t) Ep1Buffer;													  //端点1 发送数据传输地址
-	UEP2_DMA = (uint16_t) Ep2Buffer;													  //端点2 IN数据传输地址
-	UEP2_3_MOD = 0xCC;														 //端点2/3 单缓冲收发使能
-	UEP2_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK | UEP_R_RES_ACK;				 //端点2自动翻转同步标志位，IN事务返回NAK，OUT返回ACK
-
-	UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK;								 //端点1自动翻转同步标志位，IN事务返回NAK
-	UEP0_DMA = (uint16_t) Ep0Buffer;													  //端点0数据传输地址
-	UEP4_1_MOD = 0X40;														 //端点1上传缓冲区；端点0单64字节收发缓冲区
-	UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;								 //手动翻转，OUT事务返回ACK，IN事务返回NAK
-}
 
 /*******************************************************************************
 * Function Name  : DeviceInterrupt()
@@ -580,149 +534,19 @@ void uart_poll()
 {/* 串口 处理程序 */
 	uint8_t uart_data;
 	bool i2c_ack = 0;
-//	static bool i2c_status = 0;
 	static uint8_t i2c_frame_len = 0;
 	static uint8_t i2c_frame_rx_len = 0;
 	static uint8_t i2c_error_no = 0;
 	static uint8_t uart_rx_status = 0;
-	static uint8_t former_data = 0;
 	static uint8_t dontstop = 0;
 	uint8_t i;
 	
 	if(USBByteCount)   //USB接收端点有数据
 	{
 		uart_data = Ep2Buffer[USBBufOutPoint++];
-				
-		if(uart_rx_status == 0)
-		{
-			if(uart_data == 'Q')
-			{
-				v_uart_puts(SI5351_ReferenceClock); /* 26MHz Crystal */
-				v_uart_puts("\r\n");
-			}
-			else if(uart_data == 'V')
-			{ /* Version */
-				v_uart_puts(Device_Version); /* Device version */
-				v_uart_puts("\r\n");
-			}
-			else if(uart_data == 'E')
-			{
-				jump_to_bootloader();
-			
-			}
-			else if(uart_data == 'B')
-			{
-				virtual_uart_tx(Baud / 100000 + '0');
-				virtual_uart_tx(Baud % 100000 / 10000 + '0');
-				virtual_uart_tx(Baud % 10000 / 1000 + '0');
-				virtual_uart_tx(Baud % 1000 / 100 + '0');
-				virtual_uart_tx(Baud % 100 / 10 + '0');
-				virtual_uart_tx(Baud % 10 / 1 + '0');
-				v_uart_puts("\r\n");
-			}
-			else if(uart_data == 'T' && former_data != 'A') /* BAN AT commands */
-			{ /* Transmit I2C Data: T: <LEN>, 16bytes data, performing S, <AR>, <DAT>, E */
-				
-				i2c_frame_rx_len = 0;
-				uart_rx_status = 1;
-				i2c_error_no = 0;
-				i2c_frame_len = 0;
-			}
-			else if(uart_data == 'R')
-			{ /* Recieve I2C Data: R<AR><LEN> */
-				i2c_frame_rx_len = 0;
-				uart_rx_status = 3;
-				i2c_error_no = 0;
-				i2c_frame_len = 0;								
-			}
-			else if(uart_data == 'T' && former_data == 'A') /* BAN AT commands */
-			{
-				v_uart_puts("OK\r\n");
-			}
-			else if(uart_data == 'A')
-			{
-			}
-			else 
-			{
-				v_uart_puts("NOT SUPPORTED\r\n");
-			}
-		}
-		else if(uart_rx_status == 1)
-		{ // 54	03	C0	02	53	
-			i2c_frame_len = uart_data & 0x3f; /* 拿到长度 */
-			if(uart_data & 0x80)
-				dontstop = 1;
-			else
-				dontstop = 0;
-				
-			i2c_start();
-			uart_rx_status = 2;
-		}
-		else if(uart_rx_status == 2)
-		{
-			if(i2c_error_no == 0)
-			{
-				i2c_write(uart_data);
-				i2c_ack = i2c_read_ack();
-				if(i2c_ack != 1)
-				{
-					i2c_stop();
-					i2c_error_no = i2c_frame_rx_len + 1;
-				}
-			}
-			i2c_frame_rx_len ++;
-				
-			if(i2c_frame_len == i2c_frame_rx_len)
-			{
-				if(i2c_error_no == 0)
-				{
-					v_uart_puts("OK\r\n");
-					if(dontstop == 0)
-						i2c_stop(); /* 停止I2C */
-				}
-				else
-				{
-					virtual_uart_tx('F');
-					virtual_uart_tx(i2c_error_no / 10 + '0');
-					virtual_uart_tx(i2c_error_no % 10 + '0'); /* 传输失败 */
-					v_uart_puts("\r\n");
-				}
-				
-				i2c_frame_len = 0;
-				i2c_frame_rx_len = 0;
-				uart_rx_status = 0;
-				i2c_error_no = 0;
-			}
-			
-		}
-		else if(uart_rx_status == 3)
-		{
-			i2c_start();
-			i2c_write(uart_data); /* 送地址 */
-			i2c_ack = i2c_read_ack();
-			if(i2c_ack != 1)
-			{
-				v_uart_puts("FAIL\r\n");
-				i2c_stop();
-				uart_rx_status = 0;
-			}				
-			uart_rx_status = 4;
-		}
-		else if(uart_rx_status == 4)
-		{
-			i2c_frame_len = uart_data & 0x3f;
-			for(i = 0; i < i2c_frame_len; i++)
-			{
-				virtual_uart_tx(i2c_read());
-				i2c_ack = i2c_read_ack();
-				if(i2c_ack != 1)
-					break;
-			}
-			i2c_stop();
-			uart_rx_status = 0;
-		}
-		former_data = uart_data;
-		
+
+		CH554UART0SendByte(uart_data);
+
 		USBByteCount--;
 			
 		if(USBByteCount==0)
@@ -730,32 +554,48 @@ void uart_poll()
 	}
 }
 
-//主函数
-main()
-{	
-	CfgFsys( );														   //CH559时钟选择配置
-	mDelaymS(5);														  //修改主频等待内部晶振稳定,必加
-	mInitSTDIO( );														//串口0,可以用于调试
-	//UART1Setup( );														//用于CDC
 
-#ifdef DE_PRINTF
-	printf("start ...\n");
-#endif
+
+/**
+ * Firmware main
+ */
+void main() {
+	// CH55x clock selection configuration
+	CfgFsys();
+
+	// Modify the main frequency and wait for the internal crystal to stabilize.
+	mDelaymS(5);
+
+	// Serial port 0, can be used for debugging
+	mInitSTDIO();
+
+	// TODO Remove i2C
 	i2c_init();
-	
-	USBDeviceCfg();
-	USBDeviceEndPointCfg();											   //端点配置
-	USBDeviceIntCfg();													//中断初始化
-	UEP0_T_LEN = 0;
-	UEP1_T_LEN = 0;													   //预使用发送长度一定要清空
-	UEP2_T_LEN = 0;											   //预使用发送长度一定要清空
 
-	while(1)
-	{
+	// Enable USB Port
+	USBDeviceCfg();
+
+	// Endpoint configuration
+	USBDeviceEndPointCfg();
+
+	// Interrupt initialization
+	USBDeviceIntCfg();
+
+	UEP0_T_LEN = 0;
+
+	// Pre-use send length must be cleared
+	UEP1_T_LEN = 0;
+
+	// Pre-use send length must be cleared
+	UEP2_T_LEN = 0;
+
+	// Main Loop
+	while(1) {
 	    P3_2 = 1;
 		usb_poll();
-		print("Test1\r\n");
 	    P3_2 = 0;
+
+		v_uart_puts("test1\r\n");
 		uart_poll();
 	}
 }

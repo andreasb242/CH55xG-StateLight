@@ -9,6 +9,23 @@
 
 #include "inc.h"
 
+// USB BUFFER -----------------------------------------------------------------
+
+#define DEFAULT_ENDP0_SIZE	64
+#define DEFAULT_ENDP1_SIZE	64
+
+// Endpoint 0 OUT & IN buffer, must be an even address
+extern __xdata __at (0x0000) uint8_t  Ep0Buffer[DEFAULT_ENDP0_SIZE];
+
+// Endpoint 1 upload buffer
+extern __xdata __at (0x0040) uint8_t  Ep1Buffer[DEFAULT_ENDP1_SIZE];
+
+// Endpoint 2 IN & OUT buffer, must be an even address
+extern __xdata __at (0x0080) uint8_t  Ep2Buffer[2 * MAX_PACKET_SIZE];
+
+// ----------------------------------------------------------------------------
+
+
 /**
  * USB device mode configuration
  */

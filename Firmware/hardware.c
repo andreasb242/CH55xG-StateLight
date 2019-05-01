@@ -8,6 +8,19 @@
 #include "inc.h"
 #include "usb-cdc.h"
 
+// USB BUFFER -----------------------------------------------------------------
+
+// Endpoint 0 OUT & IN buffer, must be an even address
+__xdata __at (0x0000) uint8_t  Ep0Buffer[DEFAULT_ENDP0_SIZE];
+
+// Endpoint 1 upload buffer
+__xdata __at (0x0040) uint8_t  Ep1Buffer[DEFAULT_ENDP1_SIZE];
+
+// Endpoint 2 IN & OUT buffer, must be an even address
+__xdata __at (0x0080) uint8_t  Ep2Buffer[2 * MAX_PACKET_SIZE];
+
+// ----------------------------------------------------------------------------
+
 /**
  * USB device mode configuration
  */
@@ -41,7 +54,7 @@ void USBDeviceCfg() {
 
 /**
  * Enable USB Endpoint
- * /
+ */
 void USBDeviceEndPointCfg() {
 	// Endpoint 1 sends the data transfer address
 	UEP1_DMA = (uint16_t) Ep1Buffer;
@@ -70,7 +83,7 @@ void USBDeviceEndPointCfg() {
 
 /**
  * USB device mode interrupt initialization
- * /
+ */
 void USBDeviceIntCfg() {
 	// Enable device hang interrupt
 	USB_INT_EN |= bUIE_SUSPEND;
@@ -90,8 +103,6 @@ void USBDeviceIntCfg() {
 	// Allow microcontroller interrupt
 	EA = 1;
 }
-*/
-
 
 /**
  * Print string to Serial 0
