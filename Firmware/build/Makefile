@@ -11,6 +11,7 @@ XRAM_SIZE = 0x0300
 XRAM_LOC = 0x0100
 
 C_FILES = \
+	../bitbang.c \
 	../hardware.c \
 	../main.c \
 	../framework/include/debug.c

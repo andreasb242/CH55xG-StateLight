@@ -7,6 +7,7 @@
 
 #include "inc.h"
 #include "hardware.h"
+#include "bitbang.h"
 
 uint16_t SetupLen;
 uint8_t   SetupReq,Count,UsbConfig;
@@ -547,6 +548,14 @@ void uart_poll()
 
 
 
+
+
+#define LED_COUNT (3)
+__xdata uint8_t led_data[LED_COUNT * 3] = {0xff, 0, 0,
+0, 0xff, 0,
+0, 0, 0xff};
+
+
 /**
  * Firmware main
  */
@@ -561,6 +570,10 @@ void main() {
 	mInitSTDIO();
 
 	PRINT_DBG("UART init");
+
+    bitbangSetup();
+
+	PRINT_DBG("bitbangSetup");
 
 	// Enable USB Port
 	USBDeviceCfg();
@@ -595,6 +608,8 @@ void main() {
 
 		v_uart_puts("test1\r\n");
 		uart_poll();
+
+        bitbangWs2812(LED_COUNT, led_data);
 	}
 }
 
