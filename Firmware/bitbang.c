@@ -1,6 +1,6 @@
 #include "bitbang.h"
 
-#define LED_PIN 5
+#define LED_PIN 7
 SBIT(LED, 0x90, LED_PIN);
 
 
