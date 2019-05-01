@@ -6,6 +6,7 @@
 *.bin
 *.hex
 *.ihex
+*.ihx
 *.lk
 *.map
 *.mem

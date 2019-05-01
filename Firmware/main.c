@@ -563,6 +563,7 @@ void main() {
 	PRINT_DBG("UART init");
 
     bitbangSetup();
+    updateLeds();
 
 	PRINT_DBG("bitbangSetup");
 

@@ -18,3 +18,8 @@ void processCommandByte(char cmd);
  * Called from the main loop
  */
 void logicLoop();
+
+/**
+ * Update the LEDs
+ */
+void updateLeds();
