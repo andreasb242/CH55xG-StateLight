@@ -47,3 +47,9 @@ void USBDeviceIntCfg();
  * Print string to Serial 0
  */
 void print(const char* str);
+
+/**
+ * This function provided a way to access the internal bootloader
+ */
+void jumpToBootloader();
+

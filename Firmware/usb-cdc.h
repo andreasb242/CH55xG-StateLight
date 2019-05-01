@@ -11,6 +11,18 @@
 #include "inc.h"
 
 /**
- * Called in Loop to process CDC
+ * Send a string over the virtual UART
+ *
+ * @param str Null Terminated String
  */
-void usbCdcLoop();
+void v_uart_puts(char* str);
+
+/**
+ * Sed a byte over the vurtual UART
+ *
+ * @param tdata Byte to send
+ */
+void virtual_uart_tx(uint8_t tdata);
+
+
+

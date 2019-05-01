@@ -113,3 +113,24 @@ void print(const char* str) {
 		str++;
 	}
 }
+
+#define BOOT_ADDR  0x3800
+
+/**
+ * This function provided a way to access the internal bootloader
+ */
+void jumpToBootloader() {
+	USB_INT_EN = 0;
+	USB_CTRL = 0x06;
+
+	mDelaymS(100);
+
+	EA = 0;/* Disable all interrupts */
+
+	__asm
+		LJMP BOOT_ADDR /* Jump to bootloader */
+	__endasm;
+	while(1);
+}
+
+
