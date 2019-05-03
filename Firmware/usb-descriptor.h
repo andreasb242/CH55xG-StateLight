@@ -36,6 +36,7 @@ __code uint8_t CfgDesc[] ={
 // ----------------------------------------------------------------------------
 
 // Language descriptor
+// TODO Spain / English
 unsigned char __code LangDes[] = { 0x04, 0x03, 0x09, 0x04 };
 
 // Serial number string descriptor
@@ -53,12 +54,17 @@ unsigned char  __code Prod_Des[]={
 				'I',0x00,'2',0x00,'C',0x00,
 				};
 
-// Manufactorer string descriptor
+// Manufacturer string descriptor
 unsigned char  __code Manuf_Des[]={
-	0x18,0x03,
-	'Z', 0x00, 'h', 0x00, 'i', 0x00,'Y',0x00,'u', 0x00, 'a', 0x00, 'n', 0x00, ' ', 0x00,
-	'W', 0x00, 'a', 0x00, 'n', 0x00
+	28, // Length of the whole manufacturer including this byte
+	3,
+	'A', 0, 'n', 0, 'd', 0, 'r', 0, 'e', 0, 'a', 0, 's', 0, ' ', 0,
+	'B', 0, 'u', 0, 't', 0, 't', 0, 'i', 0
 };
 
-//cdc参数
-__xdata uint8_t LineCoding[7]={0x00,0xe1,0x00,0x00,0x00,0x00,0x08};   //初始化波特率为57600，1停止位，无校验，8数据位。
+// CDC parameter
+// The initial baud rate is 57600, 1 stop bit, no parity, 8 data bits.
+__xdata uint8_t LineCoding[7] = { 0x00, 0xe1, 0x00, 0x00, 0x00, 0x00, 0x08 };
+
+
+
