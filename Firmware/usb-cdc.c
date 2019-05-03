@@ -142,23 +142,23 @@ void usbInterrupt()
 						case 3:
 							if(UsbSetupBuf->wValueL == 0)
 							{
-								pDescr = LangDes;
-								len = sizeof(LangDes);
+								pDescr = g_DescriptorLanguage;
+								len = sizeof(g_DescriptorLanguage);
 							}
 							else if(UsbSetupBuf->wValueL == 1)
 							{
-								pDescr = Manuf_Des;
-								len = sizeof(Manuf_Des);
+								pDescr = g_DescriptorManufacturer;
+								len = sizeof(g_DescriptorManufacturer);
 							}
 							else if(UsbSetupBuf->wValueL == 2)
 							{
-								pDescr = Prod_Des;
-								len = sizeof(Prod_Des);
+								pDescr = g_DescriptorProduct;
+								len = sizeof(g_DescriptorProduct);
 							}
 							else
 							{
-								pDescr = SerDes;
-								len = sizeof(SerDes);
+								pDescr = g_DescriptorSerial;
+								len = sizeof(g_DescriptorSerial);
 							}
 							break;
 						default:

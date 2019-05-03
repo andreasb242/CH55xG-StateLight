@@ -37,26 +37,26 @@ __code uint8_t CfgDesc[] ={
 
 // Language descriptor
 // TODO Spain / English
-unsigned char __code LangDes[] = { 0x04, 0x03, 0x09, 0x04 };
+unsigned char __code g_DescriptorLanguage[] = { 0x04, 0x03, 0x09, 0x04 };
 
 // Serial number string descriptor
-unsigned char  __code SerDes[]={
-				0x14,0x03,
-				'2',0x00,'0',0x00,'1',0x00,'8',0x00,'-',0x00,
-				'3',0x00,'-',0x00,
-				'1',0x00,'7',0x00
-				};
+unsigned char __code g_DescriptorSerial[] = {
+	20, // Length of the whole array including this byte
+	3,
+	'2', 0, '0', 0, '1', 0, '9', 0, '-', 0, '3', 0, '-', 0, '1', 0, '7', 0
+};
 
 // Product string descriptor
-unsigned char  __code Prod_Des[]={
-				0x16,0x03,
-				'U',0x00,'S',0x00,'B',0x00,' ',0x00,'t',0x00,'o',0x00, ' ', 0x00,
-				'I',0x00,'2',0x00,'C',0x00,
-				};
+unsigned char __code g_DescriptorProduct[] = {
+	24, // Length of the whole array including this byte
+	3,
+	'S', 0, 't', 0, 'a', 0, 't', 0, 'e', 0, ' ', 0,
+	'L', 0, 'i', 0, 'g', 0, 'h', 0, 't', 0
+};
 
 // Manufacturer string descriptor
-unsigned char  __code Manuf_Des[]={
-	28, // Length of the whole manufacturer including this byte
+unsigned char __code g_DescriptorManufacturer[] = {
+	28, // Length of the whole array including this byte
 	3,
 	'A', 0, 'n', 0, 'd', 0, 'r', 0, 'e', 0, 'a', 0, 's', 0, ' ', 0,
 	'B', 0, 'u', 0, 't', 0, 't', 0, 'i', 0
