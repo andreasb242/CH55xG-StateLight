@@ -8,6 +8,7 @@
 #include "inc.h"
 #include "logic.h"
 #include "bitbang.h"
+#include "usb-cdc.h"
 
 
 #define LED_COUNT (6)

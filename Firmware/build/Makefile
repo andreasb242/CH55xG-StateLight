@@ -28,6 +28,7 @@ C_FILES = \
 	../hardware.c \
 	../logic.c \
 	../main.c \
+	../usb-cdc.c \
 	../framework/include/debug.c
 
 pre-flash:

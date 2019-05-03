@@ -52,7 +52,3 @@ void mainLoop();
  * USB device mode interrupt initialization
  */
 void USBDeviceIntCfg();
-
-// TODO Move to other file
-void v_uart_puts(char *str);
-void virtual_uart_tx(uint8_t tdata);
