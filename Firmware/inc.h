@@ -27,6 +27,7 @@
 #define __code
 #define __idata
 #define __interrupt(x)
+#define SBIT(a, b, c)
 #endif
 
 //#define PRINT_DBG(str) print(str "\r\n")

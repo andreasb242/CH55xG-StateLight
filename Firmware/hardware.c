@@ -124,7 +124,8 @@ void jumpToBootloader() {
 
 	mDelaymS(100);
 
-	EA = 0;/* Disable all interrupts */
+	// Disable all interrupts
+	EA = 0;
 
 	__asm
 		LJMP BOOT_ADDR /* Jump to bootloader */
