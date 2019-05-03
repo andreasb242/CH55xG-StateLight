@@ -11,6 +11,10 @@
 #include "logic.h"
 #include "usb-cdc.h"
 
+/**
+ * Interrupt needs to be here in the Main file
+ * else it simple won't be called.
+ */
 void DeviceInterrupt(void) __interrupt (INT_NO_USB) {
 	usbInterrupt();
 }
@@ -72,16 +76,3 @@ void main() {
 		logicLoop();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

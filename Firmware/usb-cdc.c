@@ -84,30 +84,10 @@ volatile __idata uint8_t UpPoint2_Busy  = 0;   //上传端点是否忙标志
 
 #define BOOT_ADDR  0x3800
 
-/* This function provided a way to access the internal bootloader */
-void jump_to_bootloader()
-{
-	USB_INT_EN = 0;
-	USB_CTRL = 0x06;
-
-	mDelaymS(100);
-
-	EA = 0;/* Disable all interrupts */
-
-	__asm
-		LJMP BOOT_ADDR /* Jump to bootloader */
-	__endasm;
-	while(1);
-}
-
-
-
-/*******************************************************************************
-* Function Name  : DeviceInterrupt()
-* Description	: CH559USB中断处理函数
-*******************************************************************************/
-//void DeviceInterrupt(void) __interrupt (INT_NO_USB)					   //USB中断服务程序,使用寄存器组1
-inline void usbInterrupt()
+/**
+ * USB Interrupt Handler
+ */
+void usbInterrupt()
 {
 	uint16_t len;
 	if(UIF_TRANSFER)															//USB传输完成标志
@@ -484,48 +464,54 @@ inline void usbInterrupt()
 	}
 }
 
-void virtual_uart_tx(uint8_t tdata)
-{
+void virtual_uart_tx(uint8_t tdata) {
 	Receive_Uart_Buf[Uart_Input_Point++] = tdata;
-	UartByteCount++;					//当前缓冲区剩余待取字节数
-	if(Uart_Input_Point>=UART_REV_LEN)
-	{
+
+	// Current buffer remaining bytes to be fetched
+	UartByteCount++;
+	if (Uart_Input_Point >= UART_REV_LEN) {
 		Uart_Input_Point = 0;
 	}
 }
 
-void v_uart_puts(char *str)
-{
-	while(*str)
+void v_uart_puts(char* str) {
+	while (*str) {
 		virtual_uart_tx(*(str++));
+	}
 }
 
-void usb_poll()
-{
+void usb_poll() {
 	uint8_t length;
 	static uint8_t Uart_Timeout = 0;
-	if(UsbConfig)
-	{
-		if(UartByteCount)
+	if (UsbConfig) {
+		if (UartByteCount) {
 			Uart_Timeout++;
-		if(!UpPoint2_Busy)   //端点不繁忙（空闲后的第一包数据，只用作触发上传）
-		{
+		}
+
+		// The endpoint is not busy (the first packet of data after idle, only used to trigger the upload)
+		if (!UpPoint2_Busy) {
 			length = UartByteCount;
-			if(length>0)
-			{
-				if(length>39 || Uart_Timeout>100)
-				{
+			if (length > 0) {
+				if (length > 39 || Uart_Timeout > 100) {
 					Uart_Timeout = 0;
-					if(Uart_Output_Point+length>UART_REV_LEN)
-						length = UART_REV_LEN-Uart_Output_Point;
+					if (Uart_Output_Point + length > UART_REV_LEN) {
+						length = UART_REV_LEN - Uart_Output_Point;
+					}
+
 					UartByteCount -= length;
-					//写上传端点
-					memcpy(Ep2Buffer+MAX_PACKET_SIZE,&Receive_Uart_Buf[Uart_Output_Point],length);
-					Uart_Output_Point+=length;
-					if(Uart_Output_Point>=UART_REV_LEN)
+					// Write upload endpoint
+					memcpy(Ep2Buffer + MAX_PACKET_SIZE,
+							&Receive_Uart_Buf[Uart_Output_Point], length);
+					Uart_Output_Point += length;
+					if (Uart_Output_Point >= UART_REV_LEN) {
 						Uart_Output_Point = 0;
-					UEP2_T_LEN = length;													//预使用发送长度一定要清空
-					UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;			//应答ACK
+					}
+
+					// Pre-use send length must be cleared
+					UEP2_T_LEN = length;
+
+					// Answer ACK
+					UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;
 					UpPoint2_Busy = 1;
 				}
 			}
@@ -533,19 +519,22 @@ void usb_poll()
 	}
 }
 
-void uart_poll()
-{/* 串口 处理程序 */
+/**
+ * Receive data from USB and process it
+ */
+void uart_poll() {
 	uint8_t uart_data;
 
-	if(USBByteCount)   //USB接收端点有数据
-	{
+	// USB receiving endpoint has data
+	if (USBByteCount) {
 		uart_data = Ep2Buffer[USBBufOutPoint++];
 
 		processCommandByte(uart_data);
 
 		USBByteCount--;
 
-		if(USBByteCount==0)
+		if (USBByteCount == 0) {
 			UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_ACK;
+		}
 	}
 }

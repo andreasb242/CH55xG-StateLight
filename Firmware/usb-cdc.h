@@ -12,8 +12,16 @@
 #include "inc.h"
 
 void usb_poll();
+
+/**
+ * Receive data from USB and process it
+ */
 void uart_poll();
 void v_uart_puts(char *str);
 void virtual_uart_tx(uint8_t tdata);
 
-inline void usbInterrupt();
+
+/**
+ * USB Interrupt Handler
+ */
+void usbInterrupt();

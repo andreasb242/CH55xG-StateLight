@@ -134,7 +134,7 @@ void processCommandByte(char cmd) {
 	}
 
 	if (cmd == 'i') {
-		v_uart_puts("Ampel 1.0, protcol: 1,Andreas Butti, 2019\r\n");
+		v_uart_puts("Ampel 1.0, protcol: 1,Andreas Butti - 2019\r\n");
 	} else if (cmd == 's') {
 		state = 1;
 		v_uart_puts("Set LED:\r\n");
