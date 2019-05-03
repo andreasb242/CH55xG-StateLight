@@ -11,64 +11,47 @@
 #include "usb-cdc.h"
 #include "hardware.h"
 #include "logic.h"
+#include "usb-descriptor.h"
 
 
+/**
+ * TODO Documentation
+ */
 uint16_t SetupLen;
-uint8_t   SetupReq,Count,UsbConfig;
-const uint8_t *  pDescr;			//USB配置标志
-USB_SETUP_REQ   SetupReqBuf;			//暂存Setup包
+
+/**
+ * TODO Documentation
+ */
+uint8_t SetupReq;
+
+/**
+ * TODO Documentation
+ */
+uint8_t UsbConfig;
+
+/**
+ * USB configuration flag
+ */
+const uint8_t *  pDescr;
+
+/**
+ * TODO Documentation
+ */
 #define UsbSetupBuf	 ((PUSB_SETUP_REQ)Ep0Buffer)
 
-#define  SET_LINE_CODING				0X20			// Configures DTE rate, stop-bits, parity, and number-of-character
-#define  GET_LINE_CODING				0X21			// This request allows the host to find out the currently configured line coding.
-#define  SET_CONTROL_LINE_STATE				0X22			// This request generates RS-232/V.24 style control signals.
+// Configures DTE rate, stop-bits, parity, and number-of-character
+#define SET_LINE_CODING		0X20
 
+// This request allows the host to find out the currently configured line coding.
+#define GET_LINE_CODING		0X21
+
+// This request generates RS-232/V.24 style control signals.
+#define SET_CONTROL_LINE_STATE	0X22
+
+/**
+ * Baud rate TODO Not needed for Virtual USB without hardware Serial
+ */
 uint32_t Baud = 0;
-
-/*设备描述符*/
-__code uint8_t DevDesc[] = {0x12,0x01,0x10,0x01,0x02,0x00,0x00,DEFAULT_ENDP0_SIZE,
-							0x86,0x1a,0x22,0x57,0x00,0x01,0x01,0x02,
-							0x03,0x01
-						   };
-#define SI5351_ReferenceClock		"26000000"
-#define Device_Version			"1.0.1"
-
-__code uint8_t CfgDesc[] ={
-	0x09,0x02,0x43,0x00,0x02,0x01,0x00,0xa0,0x32,			 //配置描述符（两个接口）
-	//以下为接口0（CDC接口）描述符
-	0x09,0x04,0x00,0x00,0x01,0x02,0x02,0x01,0x00,			 //CDC接口描述符(一个端点)
-	//以下为功能描述符
-	0x05,0x24,0x00,0x10,0x01,								 //功能描述符(头)
-	0x05,0x24,0x01,0x00,0x00,								 //管理描述符(没有数据类接口) 03 01
-	0x04,0x24,0x02,0x02,									  //支持Set_Line_Coding、Set_Control_Line_State、Get_Line_Coding、Serial_State
-	0x05,0x24,0x06,0x00,0x01,								 //编号为0的CDC接口;编号1的数据类接口
-	0x07,0x05,0x81,0x03,0x10,0x00,0x40,					   //中断上传端点描述符
-	//以下为接口1（数据接口）描述符
-	0x09,0x04,0x01,0x00,0x02,0x0a,0x00,0x00,0x00,			 //数据接口描述符
-	0x07,0x05,0x02,0x02,0x40,0x00,0x00,					   //端点描述符
-	0x07,0x05,0x82,0x02,0x40,0x00,0x00,					   //端点描述符
-};
-/*字符串描述符*/
-unsigned char  __code LangDes[]={0x04,0x03,0x09,0x04};		   //语言描述符
-unsigned char  __code SerDes[]={								 //序列号字符串描述符
-				0x14,0x03,
-				'2',0x00,'0',0x00,'1',0x00,'8',0x00,'-',0x00,
-				'3',0x00,'-',0x00,
-				'1',0x00,'7',0x00
-				};
-unsigned char  __code Prod_Des[]={								//产品字符串描述符
-				0x16,0x03,
-				'U',0x00,'S',0x00,'B',0x00,' ',0x00,'t',0x00,'o',0x00, ' ', 0x00,
-				'I',0x00,'2',0x00,'C',0x00,
-				};
-unsigned char  __code Manuf_Des[]={
-	0x18,0x03,
-	'Z', 0x00, 'h', 0x00, 'i', 0x00,'Y',0x00,'u', 0x00, 'a', 0x00, 'n', 0x00, ' ', 0x00,
-	'W', 0x00, 'a', 0x00, 'n', 0x00
-};
-
-//cdc参数
-__xdata uint8_t LineCoding[7]={0x00,0xe1,0x00,0x00,0x00,0x00,0x08};   //初始化波特率为57600，1停止位，无校验，8数据位。
 
 #define UART_REV_LEN  64				 //串口接收缓冲区大小
 __idata uint8_t Receive_Uart_Buf[UART_REV_LEN];   //串口接收缓冲区
@@ -265,9 +248,6 @@ void usbInterrupt()
 								if( CfgDesc[ 7 ] & 0x20 )
 								{
 									/* 休眠 */
-#ifdef DE_PRINTF
-									printf( "suspend\n" );															 //睡眠状态
-#endif
 									while ( XBUS_AUX & bUART0_TX )
 									{
 										;	//等待发送完成
@@ -418,53 +398,69 @@ void usbInterrupt()
 		}
 		UIF_TRANSFER = 0;														   //写0清空中断
 	}
-	if(UIF_BUS_RST)																 //设备模式USB总线复位中断
-	{
-#ifdef DE_PRINTF
-		printf( "reset\n" );															 //睡眠状态
-#endif
+
+	// Device Mode USB Bus Reset Interrupt
+	if (UIF_BUS_RST) {
 		UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
 		UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK;
 		UEP2_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK | UEP_R_RES_ACK;
 		USB_DEV_AD = 0x00;
 		UIF_SUSPEND = 0;
 		UIF_TRANSFER = 0;
-		UIF_BUS_RST = 0;															 //清中断标志
-		Uart_Input_Point = 0;   //循环缓冲区输入指针
-		Uart_Output_Point = 0;  //循环缓冲区读出指针
-		UartByteCount = 0;	  //当前缓冲区剩余待取字节数
-		USBByteCount = 0;	   //USB端点收到的长度
-		UsbConfig = 0;		  //清除配置值
+
+		// Clear interrupt flag
+		UIF_BUS_RST = 0;
+
+		// Circular buffer input pointer
+		Uart_Input_Point = 0;
+
+		// Circular buffer read pointer
+		Uart_Output_Point = 0;
+
+		// Current buffer remaining bytes to be fetched
+		UartByteCount = 0;
+
+		// Length received by the USB endpoint
+		USBByteCount = 0;
+
+		// Clear configuration value
+		UsbConfig = 0;
 		UpPoint2_Busy = 0;
 	}
-	if (UIF_SUSPEND)																 //USB总线挂起/唤醒完成
-	{
+
+	// USB bus suspend / wake up
+	if (UIF_SUSPEND) {
 		UIF_SUSPEND = 0;
-		if ( USB_MIS_ST & bUMS_SUSPEND )											 //挂起
-		{
-#ifdef DE_PRINTF
-			printf( "suspend\n" );															 //睡眠状态
-#endif
-			while ( XBUS_AUX & bUART0_TX )
-			{
-				;	//等待发送完成
+
+		// Hang
+		if (USB_MIS_ST & bUMS_SUSPEND) {
+			while (XBUS_AUX & bUART0_TX) {
+				; // Waiting for transmission to complete
 			}
 			SAFE_MOD = 0x55;
 			SAFE_MOD = 0xAA;
-			WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO | bWAK_RXD1_LO;					  //USB或者RXD0/1有信号时可被唤醒
-			PCON |= PD;																 //睡眠
+
+			// USB or RXD0/1 can be woken up when there is a signal
+			WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO | bWAK_RXD1_LO;
+
+			// Sleep
+			PCON |= PD;
 			SAFE_MOD = 0x55;
 			SAFE_MOD = 0xAA;
 			WAKE_CTRL = 0x00;
 		}
-	}
-	else {																			 //意外的中断,不可能发生的情况
-		USB_INT_FG = 0xFF;															 //清中断标志
+	} else {
+		// Unexpected interruption, impossible situation
 
+		// Clear interrupt flag
+		USB_INT_FG = 0xFF;
 	}
 }
 
-void virtual_uart_tx(uint8_t tdata) {
+/**
+ * Send one byte over USB CDC Serial port
+ */
+void UsbCdc_putc(uint8_t tdata) {
 	Receive_Uart_Buf[Uart_Input_Point++] = tdata;
 
 	// Current buffer remaining bytes to be fetched
@@ -474,14 +470,16 @@ void virtual_uart_tx(uint8_t tdata) {
 	}
 }
 
-void v_uart_puts(char* str) {
+/**
+ * Send 0 terminated string over USB CDC Serial port
+ */
+void UsbCdc_puts(char* str) {
 	while (*str) {
-		virtual_uart_tx(*(str++));
+		UsbCdc_putc(*(str++));
 	}
 }
 
 void usb_poll() {
-	uint8_t length;
 	static uint8_t Uart_Timeout = 0;
 	if (UsbConfig) {
 		if (UartByteCount) {
@@ -490,7 +488,7 @@ void usb_poll() {
 
 		// The endpoint is not busy (the first packet of data after idle, only used to trigger the upload)
 		if (!UpPoint2_Busy) {
-			length = UartByteCount;
+			uint8_t length = UartByteCount;
 			if (length > 0) {
 				if (length > 39 || Uart_Timeout > 100) {
 					Uart_Timeout = 0;
@@ -500,8 +498,7 @@ void usb_poll() {
 
 					UartByteCount -= length;
 					// Write upload endpoint
-					memcpy(Ep2Buffer + MAX_PACKET_SIZE,
-							&Receive_Uart_Buf[Uart_Output_Point], length);
+					memcpy(Ep2Buffer + MAX_PACKET_SIZE,	&Receive_Uart_Buf[Uart_Output_Point], length);
 					Uart_Output_Point += length;
 					if (Uart_Output_Point >= UART_REV_LEN) {
 						Uart_Output_Point = 0;
@@ -520,16 +517,11 @@ void usb_poll() {
 }
 
 /**
- * Receive data from USB and process it
+ * Receive data from USB and process it, process only one byte at once
  */
-void uart_poll() {
-	uint8_t uart_data;
-
-	// USB receiving endpoint has data
+void UsbCdc_processInput() {
 	if (USBByteCount) {
-		uart_data = Ep2Buffer[USBBufOutPoint++];
-
-		processCommandByte(uart_data);
+		processCommandByte(Ep2Buffer[USBBufOutPoint++]);
 
 		USBByteCount--;
 

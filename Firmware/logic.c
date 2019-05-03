@@ -52,7 +52,7 @@ void processCommandByte(char cmd) {
 				error = 1;
 			} else {
 				state = 2;
-				v_uart_puts("\r\nColor:\r\n");
+				UsbCdc_puts("\r\nColor:\r\n");
 				return;
 			}
 		}
@@ -60,7 +60,7 @@ void processCommandByte(char cmd) {
 		if (cmd >= '0' && cmd <= '9') {
 			ledId *= 10;
 			ledId += cmd - '0';
-			virtual_uart_tx(cmd);
+			UsbCdc_putc(cmd);
 			return;
 		} else {
 			error = 1;
@@ -81,7 +81,7 @@ void processCommandByte(char cmd) {
 			}
 
 			updateLeds();
-			v_uart_puts("LEDs set\r\n");
+			UsbCdc_puts("LEDs set\r\n");
 			state = 0;
 			ledId = 0;
 			tmpCol = 0;
@@ -105,7 +105,7 @@ void processCommandByte(char cmd) {
 		if (!error) {
 			colIndex++;
 
-			virtual_uart_tx(cmd);
+			UsbCdc_putc(cmd);
 
 			if (colIndex == 2) {
 				led_data[ledId * 3 + 1] = tmpCol;
@@ -125,7 +125,7 @@ void processCommandByte(char cmd) {
 	}
 
 	if (error) {
-		v_uart_puts("Syntax Error\r\n");
+		UsbCdc_puts("Syntax Error\r\n");
 		state = 0;
 		ledId = 0;
 		tmpCol = 0;
@@ -134,20 +134,20 @@ void processCommandByte(char cmd) {
 	}
 
 	if (cmd == 'i') {
-		v_uart_puts("Ampel 1.0, protcol: 1,Andreas Butti - 2019\r\n");
+		UsbCdc_puts("Ampel 1.0, protcol: 1,Andreas Butti - 2019\r\n");
 	} else if (cmd == 's') {
 		state = 1;
-		v_uart_puts("Set LED:\r\n");
+		UsbCdc_puts("Set LED:\r\n");
 	} else if (cmd == 'a') {
 		state = 2;
-		v_uart_puts("All Color:\r\n");
+		UsbCdc_puts("All Color:\r\n");
 		allLeds = 1;
 	} else if (cmd == '\n' || cmd == '\r') {
 		// Ignore
 	} else {
-		v_uart_puts("Unknown CMD >");
-		virtual_uart_tx(cmd);
-		v_uart_puts("<\r\n");
+		UsbCdc_puts("Unknown CMD >");
+		UsbCdc_putc(cmd);
+		UsbCdc_puts("<\r\n");
 	}
 }
 

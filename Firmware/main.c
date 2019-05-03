@@ -71,7 +71,7 @@ void main() {
 	    P3_2 = 0;
 
 //		v_uart_puts("test1\r\n");
-		uart_poll();
+		UsbCdc_processInput();
 
 		logicLoop();
 	}
