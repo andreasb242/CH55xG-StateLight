@@ -81,9 +81,9 @@ unsigned char __code g_DescriptorLanguage[] = { 0x04, 0x03, 0x09, 0x04 };
 
 // Serial number string descriptor
 unsigned char __code g_DescriptorSerial[] = {
-	20, // Length of the whole array including this byte
+	22, // Length of the whole array including this byte
 	3,
-	'2', 0, '0', 0, '1', 0, '9', 0, '-', 0, '3', 0, '-', 0, '1', 0, '7', 0
+	'2', 0, '0', 0, '1', 0, '9', 0, '-', 0, '0', 0, '5', 0, '-', 0, '0', 0, '4', 0
 };
 
 // Product string descriptor
