@@ -54,6 +54,10 @@ const uint8_t* g_pDescr;
  */
 uint32_t g_Baud = 0;
 
+// CDC parameter
+// The initial baud rate is 57600, 1 stop bit, no parity, 8 data bits.
+__xdata uint8_t g_LineCoding[7] = { 0x00, 0xe1, 0x00, 0x00, 0x00, 0x00, 0x08 };
+
 // Serial receive buffer size
 #define UART_REV_LEN 64
 
@@ -143,15 +147,15 @@ inline uint8_t processUsbDescriptionRequest() {
 	// Device descriptor
 	case 1:
 		// Send the device descriptor to the buffer to be sent
-		g_pDescr = DevDesc;
-		len = sizeof(DevDesc);
+		g_pDescr = g_DescriptorDevice;
+		len = sizeof(g_DescriptorDevice);
 		break;
 
 	// Configuration descriptor
 	case 2:
 		// Send the device descriptor to the buffer to be sent
-		g_pDescr = CfgDesc;
-		len = sizeof(CfgDesc);
+		g_pDescr = g_DescriptorConfiguration;
+		len = sizeof(g_DescriptorConfiguration);
 		break;
 
 	case 3:
@@ -203,7 +207,7 @@ inline uint8_t processStandardSetupClearRequest() {
 	// Clear device
 	if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
 		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x01) {
-			if (CfgDesc[7] & 0x20) {
+			if (g_DescriptorConfiguration[7] & 0x20) {
 				// wake
 			} else {
 				// operation failed
@@ -260,7 +264,7 @@ inline uint8_t processStandardSetupSetFeatureRequest() {
 	// Setting up the device
 	if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
 		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x01) {
-			if (CfgDesc[7] & 0x20) {
+			if (g_DescriptorConfiguration[7] & 0x20) {
 				// Sleep
 				while (XBUS_AUX & bUART0_TX) {
 					;	// Waiting for transmission to complete
@@ -405,8 +409,8 @@ inline uint8_t processNonStandardSetupRequest() {
 	switch (g_SetupReq) {
 	// This request allows the host to find out the currently configured line coding.
 	case GET_LINE_CODING:
-		g_pDescr = LineCoding;
-		len = sizeof(LineCoding);
+		g_pDescr = g_LineCoding;
+		len = sizeof(g_LineCoding);
 		// This transmission length
 		len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
 		memcpy(Ep0Buffer, g_pDescr, len);
@@ -573,11 +577,11 @@ inline void usbTransferInterrupt() {
 		//Set the serial port properties
 		if (g_SetupReq == SET_LINE_CODING) {
 			if (U_TOG_OK) {
-				memcpy(LineCoding, UsbSetupBuf, USB_RX_LEN);
-				*((uint8_t *) &g_Baud) = LineCoding[0];
-				*((uint8_t *) &g_Baud + 1) = LineCoding[1];
-				*((uint8_t *) &g_Baud + 2) = LineCoding[2];
-				*((uint8_t *) &g_Baud + 3) = LineCoding[3];
+				memcpy(g_LineCoding, UsbSetupBuf, USB_RX_LEN);
+				*((uint8_t *) &g_Baud) = g_LineCoding[0];
+				*((uint8_t *) &g_Baud + 1) = g_LineCoding[1];
+				*((uint8_t *) &g_Baud + 2) = g_LineCoding[2];
+				*((uint8_t *) &g_Baud + 3) = g_LineCoding[3];
 
 				if (g_Baud > 999999) {
 					g_Baud = 57600;

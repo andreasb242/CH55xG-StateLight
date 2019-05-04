@@ -11,21 +11,22 @@
 #include "usb-cdc.h"
 
 
-#define LED_COUNT (6)
-__xdata uint8_t led_data[LED_COUNT * 3] = {
-	0, 0x55, 0,
-	0, 0x55, 0,
-	0x33, 0x33, 0x33,
-	0x33, 0x33, 0x33,
-	0, 0x55, 0,
-	0, 0x55, 0
+#define LED_COUNT 6
+
+__xdata uint8_t g_LedData[LED_COUNT * 3] = {
+	0, 0x05, 0,
+	0, 0x05, 0,
+	0x05, 0x05, 0x05,
+	0x05, 0x05, 0x05,
+	0, 0x05, 0,
+	0, 0x05, 0
 };
 
 /**
  * Update the LEDs
  */
 void updateLeds() {
-    bitbangWs2812(LED_COUNT, led_data);
+    bitbangWs2812(LED_COUNT, g_LedData);
 }
 
 /**
@@ -74,9 +75,9 @@ void processCommandByte(char cmd) {
 			if (allLeds) {
 				uint8_t i;
 				for (i = 1; i < LED_COUNT; i++) {
-					led_data[i * 3 + 0] = led_data[0];
-					led_data[i * 3 + 1] = led_data[1];
-					led_data[i * 3 + 2] = led_data[2];
+					g_LedData[i * 3 + 0] = g_LedData[0];
+					g_LedData[i * 3 + 1] = g_LedData[1];
+					g_LedData[i * 3 + 2] = g_LedData[2];
 				}
 			}
 
@@ -108,15 +109,15 @@ void processCommandByte(char cmd) {
 			UsbCdc_putc(cmd);
 
 			if (colIndex == 2) {
-				led_data[ledId * 3 + 1] = tmpCol;
+				g_LedData[ledId * 3 + 1] = tmpCol;
 				tmpCol = 0;
 			}
 			if (colIndex == 4) {
-				led_data[ledId * 3 + 0] = tmpCol;
+				g_LedData[ledId * 3 + 0] = tmpCol;
 				tmpCol = 0;
 			}
 			if (colIndex == 6) {
-				led_data[ledId * 3 + 2] = tmpCol;
+				g_LedData[ledId * 3 + 2] = tmpCol;
 				tmpCol = 0;
 			}
 

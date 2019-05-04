@@ -9,36 +9,74 @@
 
 #include "inc.h"
 
-
 // Device descriptor
-__code uint8_t DevDesc[] = { 0x12, 0x01, 0x10, 0x01, 0x02, 0x00, 0x00,
-		DEFAULT_ENDP0_SIZE, 0x86, 0x1a, 0x22, 0x57, 0x00, 0x01, 0x01, 0x02,
-		0x03, 0x01 };
+__code uint8_t g_DescriptorDevice[] = {
+	0x12, 0x01, 0x10, 0x01, 0x02, 0x00, 0x00,
+	DEFAULT_ENDP0_SIZE,
 
-// TODO use ID: 10205 (0x27dd) | 5824 (0x16c0) | For CDC-ACM class devices (modems)
+	// Shared vendor / product id from V-USB / obdev.at
+	// Vendor
+	0xC0, 0x16,
 
-__code uint8_t CfgDesc[] ={
-	0x09,0x02,0x43,0x00,0x02,0x01,0x00,0xa0,0x32,			 //配置描述符（两个接口）
-	//以下为接口0（CDC接口）描述符
-	0x09,0x04,0x00,0x00,0x01,0x02,0x02,0x01,0x00,			 //CDC接口描述符(一个端点)
-	//以下为功能描述符
-	0x05,0x24,0x00,0x10,0x01,								 //功能描述符(头)
-	0x05,0x24,0x01,0x00,0x00,								 //管理描述符(没有数据类接口) 03 01
-	0x04,0x24,0x02,0x02,									  //支持Set_Line_Coding、Set_Control_Line_State、Get_Line_Coding、Serial_State
-	0x05,0x24,0x06,0x00,0x01,								 //编号为0的CDC接口;编号1的数据类接口
-	0x07,0x05,0x81,0x03,0x10,0x00,0x40,					   //中断上传端点描述符
-	//以下为接口1（数据接口）描述符
-	0x09,0x04,0x01,0x00,0x02,0x0a,0x00,0x00,0x00,			 //数据接口描述符
-	0x07,0x05,0x02,0x02,0x40,0x00,0x00,					   //端点描述符
-	0x07,0x05,0x82,0x02,0x40,0x00,0x00,					   //端点描述符
+	// Product
+	0xdd, 0x27,
+
+	0x00, 0x01,
+	0x01, 0x02,
+	0x03, 0x01
+};
+
+__code uint8_t g_DescriptorConfiguration[] = {
+	// ------------------------------------------------------------------------
+	// Configuration descriptor (two interfaces)
+	// ------------------------------------------------------------------------
+	0x09, 0x02, 0x43, 0x00, 0x02, 0x01, 0x00, 0xa0, 0x32,
+
+	// ------------------------------------------------------------------------
+	// The following is the interface 0 (CDC interface) descriptor
+	// ------------------------------------------------------------------------
+
+	// CDC interface descriptor (one endpoint)
+	0x09, 0x04, 0x00, 0x00, 0x01, 0x02, 0x02, 0x01, 0x00,
+
+	// ------------------------------------------------------------------------
+	// The following is the function descriptor
+	// ------------------------------------------------------------------------
+
+	// Function descriptor (header)
+	0x05, 0x24, 0x00, 0x10, 0x01,
+
+	// Management descriptor (no data class interface) 03 01
+	0x05, 0x24, 0x01, 0x00, 0x00,
+
+	// Support Set_Line_Coding, Set_Control_Line_State, Get_Line_Coding, Serial_State
+	0x04, 0x24, 0x02, 0x02,
+
+	// CDC interface numbered 0; data class interface number 1
+	0x05, 0x24, 0x06, 0x00, 0x01,
+
+	// Interrupt upload endpoint descriptor
+	0x07, 0x05, 0x81, 0x03, 0x10, 0x00, 0x40,
+
+	// ------------------------------------------------------------------------
+	// The following is the interface 1 (data interface) descriptor
+	// ------------------------------------------------------------------------
+
+	// Data interface descriptor
+	0x09, 0x04, 0x01, 0x00, 0x02, 0x0a, 0x00, 0x00, 0x00,
+
+	// Endpoint descriptor
+	0x07, 0x05, 0x02, 0x02, 0x40, 0x00, 0x00,
+
+	// Endpoint descriptor
+	0x07, 0x05, 0x82, 0x02, 0x40, 0x00, 0x00,
 };
 
 // ----------------------------------------------------------------------------
 // String descriptor
 // ----------------------------------------------------------------------------
 
-// Language descriptor
-// TODO Spain / English
+// Language descriptor: English
 unsigned char __code g_DescriptorLanguage[] = { 0x04, 0x03, 0x09, 0x04 };
 
 // Serial number string descriptor
@@ -63,10 +101,5 @@ unsigned char __code g_DescriptorManufacturer[] = {
 	'A', 0, 'n', 0, 'd', 0, 'r', 0, 'e', 0, 'a', 0, 's', 0, ' ', 0,
 	'B', 0, 'u', 0, 't', 0, 't', 0, 'i', 0
 };
-
-// CDC parameter
-// The initial baud rate is 57600, 1 stop bit, no parity, 8 data bits.
-__xdata uint8_t LineCoding[7] = { 0x00, 0xe1, 0x00, 0x00, 0x00, 0x00, 0x08 };
-
 
 
