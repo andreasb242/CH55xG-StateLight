@@ -29,9 +29,9 @@ uint8_t g_SetupReq;
 uint8_t g_UsbConfig;
 
 /**
- * USB configuration flag
+ * Pointer to the current configuration data
  */
-const uint8_t* pDescr;
+const uint8_t* g_pDescr;
 
 /**
  * Use the received data as Setup request
@@ -136,64 +136,216 @@ inline void usbWakeupSuspendInterrupt() {
  *
  * @return Length
  */
-uint8_t processStandardSetupRequest() {
+inline uint8_t processUsbDescriptionRequest() {
+	uint8_t len = 0;
+
+	switch (UsbSetupBuf->wValueH) {
+	// Device descriptor
+	case 1:
+		// Send the device descriptor to the buffer to be sent
+		g_pDescr = DevDesc;
+		len = sizeof(DevDesc);
+		break;
+
+	// Configuration descriptor
+	case 2:
+		// Send the device descriptor to the buffer to be sent
+		g_pDescr = CfgDesc;
+		len = sizeof(CfgDesc);
+		break;
+
+	case 3:
+		if (UsbSetupBuf->wValueL == 0) {
+			g_pDescr = g_DescriptorLanguage;
+			len = sizeof(g_DescriptorLanguage);
+		} else if (UsbSetupBuf->wValueL == 1) {
+			g_pDescr = g_DescriptorManufacturer;
+			len = sizeof(g_DescriptorManufacturer);
+		} else if (UsbSetupBuf->wValueL == 2) {
+			g_pDescr = g_DescriptorProduct;
+			len = sizeof(g_DescriptorProduct);
+		} else {
+			g_pDescr = g_DescriptorSerial;
+			len = sizeof(g_DescriptorSerial);
+		}
+		break;
+
+	default:
+		// Unsupported command or error
+		len = 0xff;
+		break;
+	}
+
+	if (g_SetupLen > len) {
+		// Limit total length
+		g_SetupLen = len;
+	}
+
+	// This transmission length
+	len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
+
+	// Load upload data
+	memcpy(Ep0Buffer, g_pDescr, len);
+	g_SetupLen -= len;
+	g_pDescr += len;
+
+	return len;
+}
+
+/**
+ * Process USB Standard setup clear request
+ *
+ * @return Length
+ */
+inline uint8_t processStandardSetupClearRequest() {
+	uint8_t len = 0;
+
+	// Clear device
+	if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
+		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x01) {
+			if (CfgDesc[7] & 0x20) {
+				// wake
+			} else {
+				// operation failed
+				len = 0xff;
+			}
+		} else {
+			// operation failed
+			len = 0xff;
+		}
+
+	} else if (( UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) {
+		switch ( UsbSetupBuf->wIndexL) {
+		case 0x83:
+			UEP3_CTRL = UEP3_CTRL & ~( bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
+			break;
+		case 0x03:
+			UEP3_CTRL = UEP3_CTRL & ~( bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
+			break;
+		case 0x82:
+			UEP2_CTRL = UEP2_CTRL & ~( bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
+			break;
+		case 0x02:
+			UEP2_CTRL = UEP2_CTRL & ~( bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
+			break;
+		case 0x81:
+			UEP1_CTRL = UEP1_CTRL & ~( bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
+			break;
+		case 0x01:
+			UEP1_CTRL = UEP1_CTRL & ~( bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
+			break;
+
+		default:
+			// Unsupported endpoint
+			len = 0xff;
+			break;
+		}
+
+	} else {
+		// No endpoints are not supported
+		len = 0xff;
+	}
+	return len;
+}
+
+/**
+ * Process USB Standard setup set feature request
+ *
+ * @return Length
+ */
+inline uint8_t processStandardSetupSetFeatureRequest() {
+	// defaults to operation failed
+	uint8_t len = 0xff;
+
+	// Setting up the device
+	if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
+		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x01) {
+			if (CfgDesc[7] & 0x20) {
+				// Sleep
+				while (XBUS_AUX & bUART0_TX) {
+					;	// Waiting for transmission to complete
+				}
+
+				SAFE_MOD = 0x55;
+				SAFE_MOD = 0xAA;
+
+				// USB or RXD0 / 1 can be woken up when there is a signal
+				WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO | bWAK_RXD1_LO;
+
+				// Sleep
+				PCON |= PD;
+				SAFE_MOD = 0x55;
+				SAFE_MOD = 0xAA;
+				WAKE_CTRL = 0x00;
+
+				// result success
+				len = 0;
+			}
+		}
+
+		// Set endpoint
+	} else if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_ENDP) {
+		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x00) {
+			// result success
+			len = 0;
+
+			switch (((uint16_t) UsbSetupBuf->wIndexH << 8) | UsbSetupBuf->wIndexL) {
+			case 0x83:
+				// Set endpoint 3 IN STALL
+				UEP3_CTRL = UEP3_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;
+				break;
+
+			case 0x03:
+				// Set Endpoint 3 OUT Stall
+				UEP3_CTRL = UEP3_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;
+				break;
+
+			case 0x82:
+				// Set endpoint 2 IN STALL
+				UEP2_CTRL = UEP2_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;
+				break;
+
+			case 0x02:
+				// Set Endpoint 2 OUT Stall
+				UEP2_CTRL = UEP2_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;
+				break;
+
+			case 0x81:
+				// Set endpoint 1 IN STALL
+				UEP1_CTRL = UEP1_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;
+				break;
+
+			case 0x01:
+				// Set endpoint 1 OUT Stall
+				UEP1_CTRL = UEP1_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;
+				break;
+
+			default:
+				// operation failed
+				len = 0xff;
+				break;
+			}
+		}
+	}
+
+	return len;
+}
+
+/**
+ * Process USB Standard setup request
+ *
+ * @return Length
+ */
+inline uint8_t processStandardSetupRequest() {
 	uint8_t len = 0;
 
 	// Request code
 	switch (g_SetupReq)
 	{
 	case USB_GET_DESCRIPTOR:
-		switch (UsbSetupBuf->wValueH) {
-
-		// Device descriptor
-		case 1:
-			// Send the device descriptor to the buffer to be sent
-			pDescr = DevDesc;
-			len = sizeof(DevDesc);
-			break;
-
-		//Configuration descriptor
-		case 2:
-			// Send the device descriptor to the buffer to be sent
-			pDescr = CfgDesc;
-			len = sizeof(CfgDesc);
-			break;
-		case 3:
-			if (UsbSetupBuf->wValueL == 0) {
-				pDescr = g_DescriptorLanguage;
-				len = sizeof(g_DescriptorLanguage);
-			} else if (UsbSetupBuf->wValueL == 1) {
-				pDescr = g_DescriptorManufacturer;
-				len = sizeof(g_DescriptorManufacturer);
-			} else if (UsbSetupBuf->wValueL == 2) {
-				pDescr = g_DescriptorProduct;
-				len = sizeof(g_DescriptorProduct);
-			} else {
-				pDescr = g_DescriptorSerial;
-				len = sizeof(g_DescriptorSerial);
-			}
-			break;
-
-		default:
-			// Unsupported command or error
-			len = 0xff;
-			break;
-		}
-
-		if (g_SetupLen > len) {
-			// Limit total length
-			g_SetupLen = len;
-		}
-
-		// This transmission length
-		len = g_SetupLen >= DEFAULT_ENDP0_SIZE ?
-				DEFAULT_ENDP0_SIZE : g_SetupLen;
-
-		// Load upload data
-		memcpy(Ep0Buffer, pDescr, len);
-		g_SetupLen -= len;
-		pDescr += len;
+		len = processUsbDescriptionRequest();
 		break;
+
 	case USB_SET_ADDRESS:
 		// Staging USB device address
 		g_SetupLen = UsbSetupBuf->wValueL;
@@ -215,137 +367,12 @@ uint8_t processStandardSetupRequest() {
 
 		//Clear Feature
 	case USB_CLEAR_FEATURE:
-
-		// Clear device
-		if (( UsbSetupBuf->bRequestType & 0x1F)
-				== USB_REQ_RECIP_DEVICE)
-		{
-			if ((((uint16_t) UsbSetupBuf->wValueH << 8)
-					| UsbSetupBuf->wValueL) == 0x01) {
-				if (CfgDesc[7] & 0x20) {
-					// wake
-				} else {
-					// operation failed
-					len = 0xff;
-				}
-			} else {
-				// operation failed
-				len = 0xff;
-			}
-
-		} else if (( UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK)
-				== USB_REQ_RECIP_ENDP)
-		{
-			switch ( UsbSetupBuf->wIndexL) {
-			case 0x83:
-				UEP3_CTRL =
-						UEP3_CTRL
-								& ~( bUEP_T_TOG | MASK_UEP_T_RES)| UEP_T_RES_NAK;
-				break;
-			case 0x03:
-				UEP3_CTRL =
-						UEP3_CTRL
-								& ~( bUEP_R_TOG | MASK_UEP_R_RES)| UEP_R_RES_ACK;
-				break;
-			case 0x82:
-				UEP2_CTRL =
-						UEP2_CTRL
-								& ~( bUEP_T_TOG | MASK_UEP_T_RES)| UEP_T_RES_NAK;
-				break;
-			case 0x02:
-				UEP2_CTRL =
-						UEP2_CTRL
-								& ~( bUEP_R_TOG | MASK_UEP_R_RES)| UEP_R_RES_ACK;
-				break;
-			case 0x81:
-				UEP1_CTRL =
-						UEP1_CTRL
-								& ~( bUEP_T_TOG | MASK_UEP_T_RES)| UEP_T_RES_NAK;
-				break;
-			case 0x01:
-				UEP1_CTRL =
-						UEP1_CTRL
-								& ~( bUEP_R_TOG | MASK_UEP_R_RES)| UEP_R_RES_ACK;
-				break;
-			default:
-
-				// Unsupported endpoint
-				len = 0xff;
-				break;
-			}
-
-		} else {
-			// No endpoints are not supported
-			len = 0xff;
-		}
+		len = processStandardSetupClearRequest();
 		break;
 
-
-	case USB_SET_FEATURE: /* Set Feature */
-		if (( UsbSetupBuf->bRequestType & 0x1F)
-				== USB_REQ_RECIP_DEVICE) /* 设置设备 */
-		{
-			if ((((uint16_t) UsbSetupBuf->wValueH << 8)
-					| UsbSetupBuf->wValueL) == 0x01) {
-				if (CfgDesc[7] & 0x20) {
-					/* 休眠 */
-					while (XBUS_AUX & bUART0_TX) {
-						;	//等待发送完成
-					}
-					SAFE_MOD = 0x55;
-					SAFE_MOD = 0xAA;
-					WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO
-							| bWAK_RXD1_LO;	//USB或者RXD0/1有信号时可被唤醒
-					PCON |= PD;									//睡眠
-					SAFE_MOD = 0x55;
-					SAFE_MOD = 0xAA;
-					WAKE_CTRL = 0x00;
-				} else {
-					len = 0xFF; /* 操作失败 */
-				}
-			} else {
-				len = 0xFF; /* 操作失败 */
-			}
-		} else if (( UsbSetupBuf->bRequestType & 0x1F)
-				== USB_REQ_RECIP_ENDP) /* 设置端点 */
-		{
-			if ((((uint16_t) UsbSetupBuf->wValueH << 8)
-					| UsbSetupBuf->wValueL) == 0x00) {
-				switch (((uint16_t) UsbSetupBuf->wIndexH << 8)
-						| UsbSetupBuf->wIndexL) {
-				case 0x83:
-					UEP3_CTRL = UEP3_CTRL
-							& (~bUEP_T_TOG)| UEP_T_RES_STALL;/* 设置端点3 IN STALL */
-					break;
-				case 0x03:
-					UEP3_CTRL = UEP3_CTRL
-							& (~bUEP_R_TOG)| UEP_R_RES_STALL;/* 设置端点3 OUT Stall */
-					break;
-				case 0x82:
-					UEP2_CTRL = UEP2_CTRL
-							& (~bUEP_T_TOG)| UEP_T_RES_STALL;/* 设置端点2 IN STALL */
-					break;
-				case 0x02:
-					UEP2_CTRL = UEP2_CTRL
-							& (~bUEP_R_TOG)| UEP_R_RES_STALL;/* 设置端点2 OUT Stall */
-					break;
-				case 0x81:
-					UEP1_CTRL = UEP1_CTRL
-							& (~bUEP_T_TOG)| UEP_T_RES_STALL;/* 设置端点1 IN STALL */
-					break;
-				case 0x01:
-					UEP1_CTRL = UEP1_CTRL
-							& (~bUEP_R_TOG)| UEP_R_RES_STALL;/* 设置端点1 OUT Stall */
-				default:
-					len = 0xFF; /* 操作失败 */
-					break;
-				}
-			} else {
-				len = 0xFF; /* 操作失败 */
-			}
-		} else {
-			len = 0xFF; /* 操作失败 */
-		}
+	// Set Feature
+	case USB_SET_FEATURE:
+		len = processStandardSetupSetFeatureRequest();
 		break;
 
 	case USB_GET_STATUS:
@@ -378,13 +405,13 @@ inline uint8_t processNonStandardSetupRequest() {
 	switch (g_SetupReq) {
 	// This request allows the host to find out the currently configured line coding.
 	case GET_LINE_CODING:
-		pDescr = LineCoding;
+		g_pDescr = LineCoding;
 		len = sizeof(LineCoding);
 		// This transmission length
 		len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
-		memcpy(Ep0Buffer, pDescr, len);
+		memcpy(Ep0Buffer, g_pDescr, len);
 		g_SetupLen -= len;
-		pDescr += len;
+		g_pDescr += len;
 		break;
 
 	// This request generates RS-232/V.24 style control signals
@@ -519,9 +546,9 @@ inline void usbTransferInterrupt() {
 			len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
 
 			// Load upload data
-			memcpy(Ep0Buffer, pDescr, len);
+			memcpy(Ep0Buffer, g_pDescr, len);
 			g_SetupLen -= len;
-			pDescr += len;
+			g_pDescr += len;
 			UEP0_T_LEN = len;
 
 			// Sync flag bit flip
@@ -626,27 +653,30 @@ void UsbCdc_puts(char* str) {
 	}
 }
 
-void usb_poll() {
-	static uint8_t Uart_Timeout = 0;
+/**
+ * Send usb data from buffer
+ */
+void UsbCdc_processOutput() {
+	static uint8_t uartTimeout = 0;
+
 	if (g_UsbConfig) {
 		if (UartByteCount) {
-			Uart_Timeout++;
+			uartTimeout++;
 		}
 
 		// The endpoint is not busy (the first packet of data after idle, only used to trigger the upload)
 		if (!UpPoint2_Busy) {
 			uint8_t length = UartByteCount;
 			if (length > 0) {
-				if (length > 39 || Uart_Timeout > 100) {
-					Uart_Timeout = 0;
+				if (length > 39 || uartTimeout > 100) {
+					uartTimeout = 0;
 					if (Uart_Output_Point + length > UART_REV_LEN) {
 						length = UART_REV_LEN - Uart_Output_Point;
 					}
 
 					UartByteCount -= length;
 					// Write upload endpoint
-					memcpy(Ep2Buffer + MAX_PACKET_SIZE,
-							&Receive_Uart_Buf[Uart_Output_Point], length);
+					memcpy(Ep2Buffer + MAX_PACKET_SIZE, &Receive_Uart_Buf[Uart_Output_Point], length);
 					Uart_Output_Point += length;
 					if (Uart_Output_Point >= UART_REV_LEN) {
 						Uart_Output_Point = 0;

@@ -12,9 +12,9 @@
 #include "inc.h"
 
 /**
- * TODO Documentation
+ * Send usb data from buffer
  */
-void usb_poll();
+void UsbCdc_processOutput();
 
 /**
  * Receive data from USB and process it, process only one byte at once
@@ -30,12 +30,6 @@ void UsbCdc_putc(uint8_t tdata);
  * Send 0 terminated string over USB CDC Serial port
  */
 void UsbCdc_puts(char* str);
-
-/**
- * TODO Documentation
- */
-void UsbCdc_putc(uint8_t tdata);
-
 
 /**
  * USB Interrupt Handler

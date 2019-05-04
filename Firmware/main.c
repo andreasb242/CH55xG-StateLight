@@ -67,7 +67,7 @@ void main() {
 		PRINT_DBG("l");
 
 	    P3_2 = 1;
-		usb_poll();
+		UsbCdc_processOutput();
 	    P3_2 = 0;
 
 //		v_uart_puts("test1\r\n");
