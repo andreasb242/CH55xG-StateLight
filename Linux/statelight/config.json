@@ -1,13 +1,16 @@
 {
 	"states": {
-		"Verfügbar": "002200",
-		"Beschäftigt": "222200",
-		"Am Telefon": "220000",
-		"a": "222222",
-		"b": "220022",
-		"c": "002222",
-		"d": "000022",
-		"e": "442200",
-		"f": "111144"
+		"Verfügbar": "00FF00",
+		"Beschäftigt": "FFFF00",
+		"Am Telefon": "FF0000",
+		"a": "FFFFFF",
+		"b": "FF00FF",
+		"c": "00FFFF",
+		"d": "0000FF",
+		"e": "FF7F00",
+		"f": "3F3FFF"
+	},
+	"led": {
+		"brightness": 1
 	}
 }
