@@ -39,44 +39,44 @@ const uint8_t* g_pDescr;
 #define UsbSetupBuf	((PUSB_SETUP_REQ)Ep0Buffer)
 
 // Configures DTE rate, stop-bits, parity, and number-of-character
-#define SET_LINE_CODING		0X20
+#define SET_LINE_CODING 0X20
 
 // This request allows the host to find out the currently configured line coding.
-#define GET_LINE_CODING		0X21
+#define GET_LINE_CODING 0X21
 
 // This request generates RS-232/V.24 style control signals
-#define SET_CONTROL_LINE_STATE	0X22
+#define SET_CONTROL_LINE_STATE 0X22
 
 /**
  * Baud rate, not needed for Virtual USB without hardware Serial
  * But may this is needed for another project, therefore this
  * will not be removed
  */
-uint32_t Baud = 0;
+uint32_t g_Baud = 0;
 
 // Serial receive buffer size
-#define UART_REV_LEN  64
+#define UART_REV_LEN 64
 
 // Serial receive buffer
-__idata uint8_t Receive_Uart_Buf[UART_REV_LEN];
+__idata uint8_t g_Receive_Uart_Buf[UART_REV_LEN];
 
 // The circular buffer write pointer, the bus reset needs to be initialized to 0
-volatile __idata uint8_t Uart_Input_Point = 0;
+volatile __idata uint8_t g_Uart_Input_Point = 0;
 
 // The circular buffer fetches the pointer, and the bus reset needs to be initialized to 0.
-volatile __idata uint8_t Uart_Output_Point = 0;
+volatile __idata uint8_t g_Uart_Output_Point = 0;
 
 // Current buffer remaining bytes to be fetched
-volatile __idata uint8_t UartByteCount = 0;
+volatile __idata uint8_t g_UartByteCount = 0;
 
 // Data received on behalf of the USB endpoint
-volatile __idata uint8_t USBByteCount = 0;
+volatile __idata uint8_t g_USBByteCount = 0;
 
 // Data pointer
-volatile __idata uint8_t USBBufOutPoint = 0;
+volatile __idata uint8_t g_USBBufOutPoint = 0;
 
 // Upload endpoint is busy flag
-volatile __idata uint8_t UpPoint2_Busy = 0;
+volatile __idata uint8_t g_UpPoint2_Busy = 0;
 
 /**
  * Handle USB Reset
@@ -93,20 +93,20 @@ inline void usbResetInterrupt() {
 	UIF_BUS_RST = 0;
 
 	// Circular buffer input pointer
-	Uart_Input_Point = 0;
+	g_Uart_Input_Point = 0;
 
 	// Circular buffer read pointer
-	Uart_Output_Point = 0;
+	g_Uart_Output_Point = 0;
 
 	// Current buffer remaining bytes to be fetched
-	UartByteCount = 0;
+	g_UartByteCount = 0;
 
 	// Length received by the USB endpoint
-	USBByteCount = 0;
+	g_USBByteCount = 0;
 
 	// Clear configuration value
 	g_UsbConfig = 0;
-	UpPoint2_Busy = 0;
+	g_UpPoint2_Busy = 0;
 }
 
 /**
@@ -513,17 +513,17 @@ inline void usbTransferInterrupt() {
 		UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;
 
 		// Clear busy flag
-		UpPoint2_Busy = 0;
+		g_UpPoint2_Busy = 0;
 		break;
 
 	// Endpoint 3# Endpoint Batch Down
 	case UIS_TOKEN_OUT | 2:
 		// Out of sync packets will be dropped
 		if (U_TOG_OK) {
-			USBByteCount = USB_RX_LEN;
+			g_USBByteCount = USB_RX_LEN;
 
 			// Take data pointer reset
-			USBBufOutPoint = 0;
+			g_USBBufOutPoint = 0;
 
 			// Receive a packet of data on the NAK,
 			// the main function is processed,
@@ -574,13 +574,13 @@ inline void usbTransferInterrupt() {
 		if (g_SetupReq == SET_LINE_CODING) {
 			if (U_TOG_OK) {
 				memcpy(LineCoding, UsbSetupBuf, USB_RX_LEN);
-				*((uint8_t *) &Baud) = LineCoding[0];
-				*((uint8_t *) &Baud + 1) = LineCoding[1];
-				*((uint8_t *) &Baud + 2) = LineCoding[2];
-				*((uint8_t *) &Baud + 3) = LineCoding[3];
+				*((uint8_t *) &g_Baud) = LineCoding[0];
+				*((uint8_t *) &g_Baud + 1) = LineCoding[1];
+				*((uint8_t *) &g_Baud + 2) = LineCoding[2];
+				*((uint8_t *) &g_Baud + 3) = LineCoding[3];
 
-				if (Baud > 999999) {
-					Baud = 57600;
+				if (g_Baud > 999999) {
+					g_Baud = 57600;
 				}
 
 				UEP0_T_LEN = 0;
@@ -635,12 +635,12 @@ void usbInterrupt() {
  * Send one byte over USB CDC Serial port
  */
 void UsbCdc_putc(uint8_t tdata) {
-	Receive_Uart_Buf[Uart_Input_Point++] = tdata;
+	g_Receive_Uart_Buf[g_Uart_Input_Point++] = tdata;
 
 	// Current buffer remaining bytes to be fetched
-	UartByteCount++;
-	if (Uart_Input_Point >= UART_REV_LEN) {
-		Uart_Input_Point = 0;
+	g_UartByteCount++;
+	if (g_Uart_Input_Point >= UART_REV_LEN) {
+		g_Uart_Input_Point = 0;
 	}
 }
 
@@ -660,26 +660,26 @@ void UsbCdc_processOutput() {
 	static uint8_t uartTimeout = 0;
 
 	if (g_UsbConfig) {
-		if (UartByteCount) {
+		if (g_UartByteCount) {
 			uartTimeout++;
 		}
 
 		// The endpoint is not busy (the first packet of data after idle, only used to trigger the upload)
-		if (!UpPoint2_Busy) {
-			uint8_t length = UartByteCount;
+		if (!g_UpPoint2_Busy) {
+			uint8_t length = g_UartByteCount;
 			if (length > 0) {
 				if (length > 39 || uartTimeout > 100) {
 					uartTimeout = 0;
-					if (Uart_Output_Point + length > UART_REV_LEN) {
-						length = UART_REV_LEN - Uart_Output_Point;
+					if (g_Uart_Output_Point + length > UART_REV_LEN) {
+						length = UART_REV_LEN - g_Uart_Output_Point;
 					}
 
-					UartByteCount -= length;
+					g_UartByteCount -= length;
 					// Write upload endpoint
-					memcpy(Ep2Buffer + MAX_PACKET_SIZE, &Receive_Uart_Buf[Uart_Output_Point], length);
-					Uart_Output_Point += length;
-					if (Uart_Output_Point >= UART_REV_LEN) {
-						Uart_Output_Point = 0;
+					memcpy(Ep2Buffer + MAX_PACKET_SIZE, &g_Receive_Uart_Buf[g_Uart_Output_Point], length);
+					g_Uart_Output_Point += length;
+					if (g_Uart_Output_Point >= UART_REV_LEN) {
+						g_Uart_Output_Point = 0;
 					}
 
 					// Pre-use send length must be cleared
@@ -687,7 +687,7 @@ void UsbCdc_processOutput() {
 
 					// Answer ACK
 					UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;
-					UpPoint2_Busy = 1;
+					g_UpPoint2_Busy = 1;
 				}
 			}
 		}
@@ -698,12 +698,12 @@ void UsbCdc_processOutput() {
  * Receive data from USB and process it, process only one byte at once
  */
 void UsbCdc_processInput() {
-	if (USBByteCount) {
-		processCommandByte(Ep2Buffer[USBBufOutPoint++]);
+	if (g_USBByteCount) {
+		processCommandByte(Ep2Buffer[g_USBBufOutPoint++]);
 
-		USBByteCount--;
+		g_USBByteCount--;
 
-		if (USBByteCount == 0) {
+		if (g_USBByteCount == 0) {
 			UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_ACK;
 		}
 	}
