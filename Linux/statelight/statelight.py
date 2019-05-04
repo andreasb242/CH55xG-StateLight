@@ -9,6 +9,7 @@ import signal
 import gi
 import json
 import cairo
+import serial
 from collections import OrderedDict
 
 gi.require_version('Gtk', '3.0')
@@ -41,7 +42,6 @@ def main():
 
 def apply_color(item, color):
 	global lastIconId
-	print("-->" + str(color))
 	pixbuf = draw_icon(color, True)
 	
 	lastIconId = lastIconId + 1
@@ -51,6 +51,46 @@ def apply_color(item, color):
 	iconpath = "/tmp/StateLightIcon" + str(lastIconId) + ".png"
 	pixbuf.savev(iconpath, "png", [], [])
 	indicator.set_icon_full(iconpath, str(color))
+
+	serialPort = serial.Serial("/dev/statelight", 9600, timeout=0.1)
+	
+	brightness = config["led"]["brightness"]
+	colr = int(((color >> 16) & 0xff) / brightness)
+	colg = int(((color >>  8) & 0xff) / brightness)
+	colb = int(((color >>  0) & 0xff) / brightness)
+
+	colorSend = colr << 16 | colg << 8 | colb
+	
+	cmd = "a" + ('%06x' % colorSend).upper() + "\n"
+	try:
+		serialPort.write("n".encode())
+		serialPort.flush()
+		result = serialPort.readline().decode().strip()
+		
+		if result != "OK":
+			print("Could not turn of wizard, wrong device?");
+			print("serial result 1: " + result)
+			return
+
+		print("Send cmd: «" + cmd + "»")
+		serialPort.write(cmd.encode())
+		serialPort.flush()
+		result = serialPort.readline().decode().strip()
+		print("serial result: " + result)
+		if len(result) > 0:
+			pass
+		else:
+			pass
+#			return False
+
+	except BaseException as e:
+		pass
+#		return False
+
+	try:
+		serialPort.close()
+	except BaseException as e:
+		pass
 
 
 def draw_icon(color, small = False):
