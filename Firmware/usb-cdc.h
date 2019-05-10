@@ -27,6 +27,11 @@ void UsbCdc_processInput();
 void UsbCdc_putc(uint8_t tdata);
 
 /**
+ * Send uint8_t over CDC Serial port
+ */
+void UsbCdc_puti(uint8_t value);
+
+/**
  * Send 0 terminated string over USB CDC Serial port
  */
 void UsbCdc_puts(char* str);

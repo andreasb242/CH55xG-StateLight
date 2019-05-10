@@ -10,14 +10,24 @@
 #include "bitbang.h"
 #include "logic.h"
 #include "usb-cdc.h"
+#include "timer.h"
 
 /**
  * Interrupt needs to be here in the Main file
  * else it simple won't be called.
  */
-void DeviceInterrupt(void) __interrupt (INT_NO_USB) {
+void DeviceInterrupt(void) __interrupt(INT_NO_USB) {
 	usbInterrupt();
 }
+
+
+/**
+ * Timer 0 interrupt
+ */
+void timer0() __interrupt(INT_NO_TMR0) {
+	timer0clock();
+}
+
 
 /**
  * Firmware main
@@ -33,6 +43,9 @@ void main() {
 	mInitSTDIO();
 
 	PRINT_DBG("UART init");
+
+	// Initialize timer
+	timerSetup();
 
     bitbangSetup();
     updateLeds();
@@ -70,7 +83,6 @@ void main() {
 		UsbCdc_processOutput();
 	    P3_2 = 0;
 
-//		v_uart_puts("test1\r\n");
 		UsbCdc_processInput();
 
 		logicLoop();

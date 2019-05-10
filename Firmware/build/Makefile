@@ -28,6 +28,9 @@ C_FILES = \
 	../hardware.c \
 	../logic.c \
 	../main.c \
+	../parser.c \
+	../eeprom.c \
+	../timer.c \
 	../usb-cdc.c \
 	../framework/include/debug.c
 

@@ -12,6 +12,8 @@
 #include "hardware.h"
 #include "logic.h"
 #include "usb-descriptor.h"
+#include "parser.h"
+
 
 /**
  * Setup length
@@ -649,6 +651,28 @@ void UsbCdc_putc(uint8_t tdata) {
 }
 
 /**
+ * Send uint8_t over CDC Serial port
+ */
+void UsbCdc_puti(uint8_t value) {
+	uint8_t i = 3;
+	char data[4];
+	data[3] = 0;
+
+	if (value == 0) {
+		UsbCdc_putc('0');
+		return;
+	}
+
+	while (value > 0) {
+		i--;
+		data[i] = (value % 10) + '0';
+		value /= 10;
+	}
+
+	UsbCdc_puts(data + i);
+}
+
+/**
  * Send 0 terminated string over USB CDC Serial port
  */
 void UsbCdc_puts(char* str) {
@@ -703,7 +727,7 @@ void UsbCdc_processOutput() {
  */
 void UsbCdc_processInput() {
 	if (g_USBByteCount) {
-		processCommandByte(Ep2Buffer[g_USBBufOutPoint++]);
+		parseCmd(Ep2Buffer[g_USBBufOutPoint++]);
 
 		g_USBByteCount--;
 
