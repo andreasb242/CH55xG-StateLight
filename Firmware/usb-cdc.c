@@ -13,6 +13,7 @@
 #include "logic.h"
 #include "usb-descriptor.h"
 #include "parser.h"
+#include "eeprom.h"
 
 
 /**
@@ -36,6 +37,9 @@ const uint8_t* g_pDescr;
  * Setup length, is decremented if a block is sent, see g_pDescr
  */
 uint16_t g_SetupLen;
+
+// Buffer for dynamic generated setup responses
+uint8_t g_SetupRamBuffer[32];
 
 /**
  * Use the received data as Setup request
@@ -133,11 +137,72 @@ inline void usbWakeupSuspendInterrupt() {
 
 		// Sleep
 		PCON |= PD;
+
 		SAFE_MOD = 0x55;
 		SAFE_MOD = 0xAA;
 		WAKE_CTRL = 0x00;
 	}
 }
+
+
+/**
+ * Transmit a Setup Block, increment pointer,
+ * decrement remaining block length.
+ * Calculate Length
+ *
+ * @param len Length
+ * @return Length
+ */
+uint8_t transmitSetupBlock(uint8_t len) {
+	// This transmission length
+	len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
+
+	// Load upload data, increment pointer, so the data is transmitted in Blocks
+	memcpy(Ep0Buffer, g_pDescr, len);
+	g_SetupLen -= len;
+	g_pDescr += len;
+
+	return len;
+}
+
+
+/**
+ * Check if there is a custom PID / VID Configured, and overwrite the basic one
+ * This is used to force e.g. Windows 7 to use a specific driver
+ */
+void prepareUsbIds() {
+	uint8_t a = 0;
+
+	if (ReadDataFlash(4, 1, &a) != 1) {
+		return;
+	}
+
+	// Use this char at pos 5 on EEPROM to mark the PID / VID should be loaded
+	if (a != '>') {
+		return;
+	}
+
+	if (ReadDataFlash(0, 1, &a) != 1) {
+		return;
+	}
+	g_SetupRamBuffer[9] = a;
+
+	if (ReadDataFlash(1, 1, &a) != 1) {
+		return;
+	}
+	g_SetupRamBuffer[8] = a;
+
+	if (ReadDataFlash(2, 1, &a) != 1) {
+		return;
+	}
+	g_SetupRamBuffer[11] = a;
+
+	if (ReadDataFlash(3, 1, &a) != 1) {
+		return;
+	}
+	g_SetupRamBuffer[10] = a;
+}
+
 
 /**
  * Process USB Standard setup request
@@ -151,8 +216,13 @@ inline uint8_t processUsbDescriptionRequest() {
 	// Device descriptor
 	case 1:
 		// Send the device descriptor to the buffer to be sent
-		g_pDescr = g_DescriptorDevice;
 		len = sizeof(g_DescriptorDevice);
+		memcpy(g_SetupRamBuffer, g_DescriptorDevice, len);
+
+		// Update USB IDs
+		prepareUsbIds();
+
+		g_pDescr = g_SetupRamBuffer;
 		break;
 
 	// Configuration descriptor
@@ -166,12 +236,15 @@ inline uint8_t processUsbDescriptionRequest() {
 		if (UsbSetupBuf->wValueL == 0) {
 			g_pDescr = g_DescriptorLanguage;
 			len = sizeof(g_DescriptorLanguage);
+
 		} else if (UsbSetupBuf->wValueL == 1) {
 			g_pDescr = g_DescriptorManufacturer;
 			len = sizeof(g_DescriptorManufacturer);
+
 		} else if (UsbSetupBuf->wValueL == 2) {
 			g_pDescr = g_DescriptorProduct;
 			len = sizeof(g_DescriptorProduct);
+
 		} else {
 			g_pDescr = g_DescriptorSerial;
 			len = sizeof(g_DescriptorSerial);
@@ -189,15 +262,7 @@ inline uint8_t processUsbDescriptionRequest() {
 		g_SetupLen = len;
 	}
 
-	// This transmission length
-	len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
-
-	// Load upload data, increment pointer, so the data is transmitted in Blocks
-	memcpy(Ep0Buffer, g_pDescr, len);
-	g_SetupLen -= len;
-	g_pDescr += len;
-
-	return len;
+	return transmitSetupBlock(len);
 }
 
 /**
@@ -298,7 +363,7 @@ inline uint8_t processStandardSetupSetFeatureRequest() {
 		}
 
 		// Set endpoint
-	} else if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_ENDP) {
+	} else if ((UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_ENDP) {
 		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x00) {
 			// result success
 			len = 0;
@@ -421,13 +486,7 @@ inline uint8_t processNonStandardSetupRequest() {
 		g_pDescr = g_LineCoding;
 		len = sizeof(g_LineCoding);
 
-		// This transmission length
-		len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
-		memcpy(Ep0Buffer, g_pDescr, len);
-
-		// increment pointer, so the data is transmitted in Blocks
-		g_SetupLen -= len;
-		g_pDescr += len;
+		len = transmitSetupBlock(len);
 		break;
 
 	// This request generates RS-232/V.24 style control signals
@@ -459,7 +518,7 @@ uint8_t processSetupRequest() {
 	g_SetupReq = UsbSetupBuf->bRequest;
 
 	// Non-standard request
-	if (( UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) != USB_REQ_TYP_STANDARD) {
+	if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) != USB_REQ_TYP_STANDARD) {
 		len = processNonStandardSetupRequest();
 	} else { // Standard request
 		len = processStandardSetupRequest();
@@ -473,7 +532,7 @@ uint8_t processSetupRequest() {
  */
 inline void usbSetupInterrupt() {
 	uint8_t len;
-	if (USB_RX_LEN == (sizeof(USB_SETUP_REQ))) {
+	if (USB_RX_LEN == sizeof(USB_SETUP_REQ)) {
 		len = processSetupRequest();
 	} else {
 		// Wrong packet length
@@ -557,14 +616,7 @@ inline void usbTransferInterrupt() {
 	case UIS_TOKEN_IN | 0:
 		switch (g_SetupReq) {
 		case USB_GET_DESCRIPTOR:
-
-			// This transmission length
-			len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
-
-			// Load upload data, increment pointer, so the data is transmitted in Blocks
-			memcpy(Ep0Buffer, g_pDescr, len);
-			g_SetupLen -= len;
-			g_pDescr += len;
+			len = transmitSetupBlock(len);
 			UEP0_T_LEN = len;
 
 			// Sync flag bit flip
