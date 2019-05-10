@@ -16,11 +16,6 @@
 
 
 /**
- * Setup length
- */
-uint16_t g_SetupLen;
-
-/**
  * Last setup request
  */
 uint8_t g_SetupReq;
@@ -31,9 +26,16 @@ uint8_t g_SetupReq;
 uint8_t g_UsbConfig;
 
 /**
- * Pointer to the current configuration data
+ * Pointer to the current configuration data,
+ * this pointer is incremented on transmission,
+ * if a block is sent, while g_SetupLen is decremented
  */
 const uint8_t* g_pDescr;
+
+/**
+ * Setup length, is decremented if a block is sent, see g_pDescr
+ */
+uint16_t g_SetupLen;
 
 /**
  * Use the received data as Setup request
@@ -190,7 +192,7 @@ inline uint8_t processUsbDescriptionRequest() {
 	// This transmission length
 	len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
 
-	// Load upload data
+	// Load upload data, increment pointer, so the data is transmitted in Blocks
 	memcpy(Ep0Buffer, g_pDescr, len);
 	g_SetupLen -= len;
 	g_pDescr += len;
@@ -207,7 +209,7 @@ inline uint8_t processStandardSetupClearRequest() {
 	uint8_t len = 0;
 
 	// Clear device
-	if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
+	if ((UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
 		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x01) {
 			if (g_DescriptorConfiguration[7] & 0x20) {
 				// wake
@@ -220,25 +222,30 @@ inline uint8_t processStandardSetupClearRequest() {
 			len = 0xff;
 		}
 
-	} else if (( UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) {
-		switch ( UsbSetupBuf->wIndexL) {
+	} else if ((UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) {
+		switch (UsbSetupBuf->wIndexL) {
 		case 0x83:
-			UEP3_CTRL = UEP3_CTRL & ~( bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
+			UEP3_CTRL = UEP3_CTRL & ~(bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
 			break;
+
 		case 0x03:
-			UEP3_CTRL = UEP3_CTRL & ~( bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
+			UEP3_CTRL = UEP3_CTRL & ~(bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
 			break;
+
 		case 0x82:
-			UEP2_CTRL = UEP2_CTRL & ~( bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
+			UEP2_CTRL = UEP2_CTRL & ~(bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
 			break;
+
 		case 0x02:
-			UEP2_CTRL = UEP2_CTRL & ~( bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
+			UEP2_CTRL = UEP2_CTRL & ~(bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
 			break;
+
 		case 0x81:
-			UEP1_CTRL = UEP1_CTRL & ~( bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
+			UEP1_CTRL = UEP1_CTRL & ~(bUEP_T_TOG | MASK_UEP_T_RES) | UEP_T_RES_NAK;
 			break;
+
 		case 0x01:
-			UEP1_CTRL = UEP1_CTRL & ~( bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
+			UEP1_CTRL = UEP1_CTRL & ~(bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
 			break;
 
 		default:
@@ -264,7 +271,7 @@ inline uint8_t processStandardSetupSetFeatureRequest() {
 	uint8_t len = 0xff;
 
 	// Setting up the device
-	if (( UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
+	if ((UsbSetupBuf->bRequestType & 0x1F) == USB_REQ_RECIP_DEVICE) {
 		if ((((uint16_t) UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x01) {
 			if (g_DescriptorConfiguration[7] & 0x20) {
 				// Sleep
@@ -280,6 +287,7 @@ inline uint8_t processStandardSetupSetFeatureRequest() {
 
 				// Sleep
 				PCON |= PD;
+
 				SAFE_MOD = 0x55;
 				SAFE_MOD = 0xAA;
 				WAKE_CTRL = 0x00;
@@ -346,8 +354,7 @@ inline uint8_t processStandardSetupRequest() {
 	uint8_t len = 0;
 
 	// Request code
-	switch (g_SetupReq)
-	{
+	switch (g_SetupReq) {
 	case USB_GET_DESCRIPTOR:
 		len = processUsbDescriptionRequest();
 		break;
@@ -413,9 +420,12 @@ inline uint8_t processNonStandardSetupRequest() {
 	case GET_LINE_CODING:
 		g_pDescr = g_LineCoding;
 		len = sizeof(g_LineCoding);
+
 		// This transmission length
 		len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
 		memcpy(Ep0Buffer, g_pDescr, len);
+
+		// increment pointer, so the data is transmitted in Blocks
 		g_SetupLen -= len;
 		g_pDescr += len;
 		break;
@@ -477,7 +487,7 @@ inline void usbSetupInterrupt() {
 		UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_STALL | UEP_T_RES_STALL;
 
 	} else if (len <= DEFAULT_ENDP0_SIZE) {
-		//Upload data or status stage returns 0 length package
+		// Upload data or status stage returns 0 length package
 
 		UEP0_T_LEN = len;
 		// The default packet is DATA1, which returns a response ACK.
@@ -551,7 +561,7 @@ inline void usbTransferInterrupt() {
 			// This transmission length
 			len = g_SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : g_SetupLen;
 
-			// Load upload data
+			// Load upload data, increment pointer, so the data is transmitted in Blocks
 			memcpy(Ep0Buffer, g_pDescr, len);
 			g_SetupLen -= len;
 			g_pDescr += len;

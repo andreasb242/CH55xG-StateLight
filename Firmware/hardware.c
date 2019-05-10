@@ -99,7 +99,7 @@ void USBDeviceIntCfg() {
 	// Enable USB interrupt
 	IE_USB = 1;
 
-	// Allow microcontroller interrupt
+	// Enable global interrupts
 	EA = 1;
 }
 
