@@ -40,6 +40,27 @@ def main():
 	gtk.main()
 
 
+def send_command(cmd):
+	serialPort = serial.Serial("/dev/statelight", 9600, timeout=0.1)
+	result = ""
+
+	try:
+		print("Send cmd: «" + cmd + "»")
+		serialPort.write(cmd.encode())
+		serialPort.flush()
+		result = serialPort.readline().decode().strip()
+		print("serial result: «" + result + "»")
+	except BaseException as e:
+		return False, "Exception " + str(e)
+
+	try:
+		serialPort.close()
+	except BaseException as e:
+		return False, "Exception " + str(e)
+
+	return result == "OK", result
+
+
 def apply_color(item, color):
 	global lastIconId
 	pixbuf = draw_icon(color, True)
@@ -52,45 +73,17 @@ def apply_color(item, color):
 	pixbuf.savev(iconpath, "png", [], [])
 	indicator.set_icon_full(iconpath, str(color))
 
-	serialPort = serial.Serial("/dev/statelight", 9600, timeout=0.1)
-	
 	brightness = config["led"]["brightness"]
 	colr = int(((color >> 16) & 0xff) / brightness)
 	colg = int(((color >>  8) & 0xff) / brightness)
 	colb = int(((color >>  0) & 0xff) / brightness)
 
 	colorSend = colr << 16 | colg << 8 | colb
-	
+
 	cmd = "a" + ('%06x' % colorSend).upper() + "\n"
-	try:
-		serialPort.write("n".encode())
-		serialPort.flush()
-		result = serialPort.readline().decode().strip()
-		
-		if result != "OK":
-			print("Could not turn of wizard, wrong device?");
-			print("serial result 1: " + result)
-			return
-
-		print("Send cmd: «" + cmd + "»")
-		serialPort.write(cmd.encode())
-		serialPort.flush()
-		result = serialPort.readline().decode().strip()
-		print("serial result: " + result)
-		if len(result) > 0:
-			pass
-		else:
-			pass
-#			return False
-
-	except BaseException as e:
-		pass
-#		return False
-
-	try:
-		serialPort.close()
-	except BaseException as e:
-		pass
+	ok, result = send_command(cmd)
+	if ok == False:
+		print("Send data failed with «" + result + "»")
 
 
 def draw_icon(color, small = False):
@@ -109,12 +102,8 @@ def draw_icon(color, small = False):
 		cr.rectangle(0, 0, 16, 16)
 		cr.fill()
 
-#	cr.move_to(0, 0)
-#	cr.line_to(16, 16)
-#	cr.stroke()
-
 	return gdk.pixbuf_get_from_surface(surface, 0, 0, 16, 16)
-	
+
 
 def build_menu():
 	menu = gtk.Menu()

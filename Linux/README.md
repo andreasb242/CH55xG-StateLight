@@ -3,7 +3,7 @@
 To make sure the device has always the same name on Linux.
 
 ```
-cp 10-statelight.rules /etc/udev/rules.d/
+sudo cp 10-statelight.rules /etc/udev/rules.d/
 ```
 
 ## Install client

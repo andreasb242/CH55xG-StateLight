@@ -128,7 +128,7 @@ void parseCmd(char c) {
 				return;
 			}
 
-			if (c < '0' || c >= '9') {
+			if (c < '0' || c > '9') {
 				parserResult.cmd = 0;
 				g_ParserState == 255;
 			}
@@ -141,7 +141,7 @@ void parseCmd(char c) {
 				return;
 			}
 
-			if (c < '0' || c >= '9') {
+			if (c < '0' || c > '9') {
 				parserResult.cmd = 0;
 				g_ParserState == 255;
 			}
