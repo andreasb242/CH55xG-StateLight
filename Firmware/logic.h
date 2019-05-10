@@ -18,3 +18,8 @@ void logicLoop();
  * Update the LEDs
  */
 void updateLeds();
+
+/**
+ * Load colors from EEPROM, if valid data is there
+ */
+void loadColorsFromEeprom();

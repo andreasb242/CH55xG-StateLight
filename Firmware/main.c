@@ -47,6 +47,8 @@ void main() {
 	// Initialize timer
 	timerSetup();
 
+	loadColorsFromEeprom();
+
     bitbangSetup();
     updateLeds();
 

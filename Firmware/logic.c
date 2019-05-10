@@ -77,6 +77,27 @@ __xdata uint8_t g_LedDataTmp[LED_COUNT * 3] = {
 };
 
 /**
+ * Load colors from EEPROM, if valid data is there
+ */
+void loadColorsFromEeprom() {
+	uint8_t a = 0;
+	uint8_t i;
+	uint8_t tmp[3];
+	ReadDataFlash(23, 1, &a);
+
+	if (a != '>') {
+		return;
+	}
+
+	for (i = 0; i < LED_COUNT; i++) {
+		ReadDataFlash(5 + i * 3, 3, tmp);
+		g_LedData[i * 3 + 0] = tmp[1];
+		g_LedData[i * 3 + 1] = tmp[0];
+		g_LedData[i * 3 + 2] = tmp[2];
+	}
+}
+
+/**
  * Blink the LEDs
  */
 void blinkLeds();
