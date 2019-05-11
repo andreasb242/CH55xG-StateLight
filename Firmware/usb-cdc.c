@@ -203,6 +203,27 @@ void prepareUsbIds() {
 	g_SetupRamBuffer[10] = a;
 }
 
+/**
+ * Read custom serial from EEPROM
+ *
+ * @return Len, 0xff if nothing was read
+ */
+inline uint8_t readSerialFromEeprom() {
+	uint8_t i;
+	if (ReadDataFlash(24, sizeof(g_SetupRamBuffer) - 2, g_SetupRamBuffer + 2) != 1) {
+		for (i = 2; i < sizeof(g_SetupRamBuffer) - 1; i += 2) {
+			if (g_SetupRamBuffer[i] == 255 || (g_SetupRamBuffer[i] == 0 && g_SetupRamBuffer[i + 1] == 0)) {
+				if (i > 2) {
+					return i;
+				} else {
+					break;
+				}
+			}
+		}
+	}
+
+	return 0xff;
+}
 
 /**
  * Process USB Standard setup request
@@ -246,8 +267,24 @@ inline uint8_t processUsbDescriptionRequest() {
 			len = sizeof(g_DescriptorProduct);
 
 		} else {
-			g_pDescr = g_DescriptorSerial;
-			len = sizeof(g_DescriptorSerial);
+			// Return Serial Number
+
+			g_pDescr = g_SetupRamBuffer;
+			g_SetupRamBuffer[1] = 3;
+
+			len = readSerialFromEeprom();
+
+			if (len == 0xff) {
+				len = 8;
+				g_SetupRamBuffer[2] = '0';
+				g_SetupRamBuffer[3] = 0;
+				g_SetupRamBuffer[4] = '0';
+				g_SetupRamBuffer[5] = 0;
+				g_SetupRamBuffer[6] = '1';
+				g_SetupRamBuffer[7] = 0;
+			}
+
+			g_SetupRamBuffer[0] = len;
 		}
 		break;
 

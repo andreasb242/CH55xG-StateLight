@@ -78,17 +78,6 @@ __code uint8_t g_DescriptorConfiguration[] = {
 // Language descriptor: English
 unsigned char __code g_DescriptorLanguage[] = { 0x04, 0x03, 0x09, 0x04 };
 
-// Serial number string descriptor
-// Use this as identifier for Linux,
-// the Name is the only Attribute displayed on Windows
-unsigned char __code g_DescriptorSerial[] = {
-	30, // Length of the whole array including this byte
-	3,
-	'S', 0, 't', 0, 'a', 0, 't', 0, 'e', 0, ' ', 0,
-	'L', 0, 'i', 0, 'g', 0, 'h', 0, 't', 0, ' ', 0,
-	'A', 0, 'B', 0
-};
-
 // Product string descriptor
 unsigned char __code g_DescriptorProduct[] = {
 	24, // Length of the whole array including this byte

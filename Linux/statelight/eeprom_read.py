@@ -25,7 +25,11 @@ def main():
 
 
 def send_command(cmd):
-	serialPort = serial.Serial("/dev/statelight", 9600, timeout=0.1)
+	try:
+		serialPort = serial.Serial("/dev/statelight", 9600, timeout=0.1)
+	except BaseException as e:
+		serialPort = serial.Serial("/dev/ttyACM0", 9600, timeout=0.1)
+
 	result = ""
 
 	try:

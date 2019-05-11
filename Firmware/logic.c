@@ -165,6 +165,14 @@ void parserExecuteCommand() {
 		break;
 
 	case 'c':
+		if (ReadDataFlash(parserResult.a, 1, &v) == 1) {
+			if (v == parserResult.b) {
+				// Already the correct value there
+				UsbCdc_puts("OK\r\n");
+				return;
+			}
+		}
+
 		if (WriteDataFlash(parserResult.a, &parserResult.b, 1) == 1) {
 			UsbCdc_puts("OK\r\n");
 		} else {

@@ -75,12 +75,12 @@ Write value to EEPROM
 ## EEPROM Config
 0 - 1: USB VID
 2 - 3: USB PID
-4: Checksum VID & PID, VID1 ^ VID2 ^ PID1 ^ PID2
+4: '>' if USB ID SHould be readed
 
-5 - 14: Startup RGB Colors
+5 - 23: Startup RGB Colors, RRGGBB.
+24: '>' if RGB Colors should be read
 
-15: Length Device Name, if < 1 || > 60 the default name is used
-16 - 76: Device Name, UTF16
+25 ... n: Serial, Terminated with double 0, FF are ignored
 
 
 
