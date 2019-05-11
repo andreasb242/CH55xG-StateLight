@@ -51,16 +51,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LedConnection.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="StateLightSystemTray.cs" />
+    <Compile Include="src\ColorMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="src\LedConnection.cs" />
+    <Compile Include="src\Settings.cs" />
+    <Compile Include="src\StateLightSystemTray.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
