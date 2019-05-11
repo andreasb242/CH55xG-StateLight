@@ -1,9 +1,0 @@
-﻿Verfügbar:#00FF00
-Beschäftig:#FFFF00
-Am Telefon:#FF0000
-a:#FFFFFF
-b:#FF00FF
-c:#00FFFF
-d:#0000FF
-e:#FF7F00
-f:#3F3FFF

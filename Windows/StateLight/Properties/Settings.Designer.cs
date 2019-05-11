@@ -46,5 +46,18 @@ namespace StateLight.Properties {
                 this["UsbIdSearch"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Verfügbar:#00FF00\r\nBeschäftig:#FFFF00\r\nAm Telefon:#FF0000\r\na:#FFFFFF\r\nb:#FF00FF\r\n" +
+            "c:#00FFFF\r\nd:#0000FF\r\ne:#FF7F00\r\nf:#3F3FFF")]
+        public string States {
+            get {
+                return ((string)(this["States"]));
+            }
+            set {
+                this["States"] = value;
+            }
+        }
     }
 }

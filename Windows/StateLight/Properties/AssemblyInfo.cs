@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Andreas Butti")]
 [assembly: AssemblyProduct("StateLight")]
-[assembly: AssemblyCopyright("Copyright ©  2019 Andreas Butti")]
+[assembly: AssemblyCopyright("Copyright © 2019 Andreas Butti")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

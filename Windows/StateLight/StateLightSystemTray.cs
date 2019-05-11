@@ -56,13 +56,15 @@ namespace StateLight
 
 		private void GenerateContextMenu()
 		{
-			using (StreamReader f = new StreamReader("States.txt"))
+			foreach (string line in Properties.Settings.Default.States.Split('\n'))
 			{
-				string line;
-				while ((line = f.ReadLine()) != null)
+				string line2 = line.Trim();
+				if (line2.Equals(""))
 				{
-					ParseLine(line);
+					continue;
 				}
+
+				ParseLine(line2);
 			}
 		}
 
