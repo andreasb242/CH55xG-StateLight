@@ -20,6 +20,11 @@ namespace StateLight
 		/// </summary>
 		private ContextMenu menu = new ContextMenu();
 
+		/// <summary>
+		/// LED Connection to the hardware
+		/// </summary>
+		private LedConnection led = new LedConnection();
+
 		public StateLightSystemTray()
 		{
 			// Initialize Tray Icon
@@ -28,6 +33,18 @@ namespace StateLight
 				Icon = new Icon("icon.ico"),
 				ContextMenu = menu,
 				Visible = true
+			};
+			trayIcon.MouseClick += (object sender, MouseEventArgs e) =>
+			{
+				if (e.Button != MouseButtons.Left)
+				{
+					return;
+				}
+
+				trayIcon.BalloonTipTitle = "State Light";
+				trayIcon.BalloonTipText = "Hier sollte der Gerätestatus stehen...";
+				trayIcon.BalloonTipIcon = ToolTipIcon.Info;
+				trayIcon.ShowBalloonTip(10000);
 			};
 
 			GenerateContextMenu();
@@ -54,7 +71,7 @@ namespace StateLight
 			string name = line.Substring(0, pos).Trim();
 			string color = line.Substring(pos + 1).Trim();
 
-			ColorMenuItem cm = new ColorMenuItem(name);
+			ColorMenuItem cm = new ColorMenuItem(led, name, System.Drawing.ColorTranslator.FromHtml(color));
 			menu.MenuItems.Add(cm);
 		}
 
@@ -70,23 +87,60 @@ namespace StateLight
 
 	class ColorMenuItem : MenuItem
 	{
-		public ColorMenuItem(string name) : base(name)
+		/// <summary>
+		/// Menu Item Name
+		/// </summary>
+		private String name;
+
+		/// <summary>
+		/// Color
+		/// </summary>
+		private Color color;
+
+		/// <summary>
+		/// LED Connection to the hardware
+		/// </summary>
+		private LedConnection led;
+
+		private const int MENU_HEIGHT = 22;
+		private const int MENU_WIDTH = 150;
+
+		public ColorMenuItem(LedConnection led, string name, Color color) : base(name)
 		{
-			Bitmap image = new Bitmap(16, 16);
-			using (Graphics g = Graphics.FromImage(image))
-			{
-				g.DrawRectangle(Pens.Red, 4, 4, 8, 8);
-			}
+			this.led = led;
+			this.name = name;
+			this.color = color;
 
-//			Icon = Icon.FromHandle(image.GetHicon());
+			OwnerDraw = true;
+			Click += new EventHandler(MenuHelpOnClick);
+			DrawItem += new DrawItemEventHandler(MenuHelpOnDrawItem);
+			MeasureItem += new MeasureItemEventHandler(MenuHelpOnMeasureItem);
+		}
 
-			// DrawItem += delegate (object sender, DrawItemEventArgs e) {
-			//	double factor = (double)e.Bounds.Height / zeroIconBmp.Height;
-			//	var rect = new Rectangle(e.Bounds.X, e.Bounds.Y,
-			//								(int)(zeroIconBmp.Width * factor),
-			//								(int)(zeroIconBmp.Height * factor));
-			//	e.Graphics.DrawImage(zeroIconBmp, rect);
-			//};
+		void MenuHelpOnMeasureItem(object obj, MeasureItemEventArgs miea)
+		{
+			miea.ItemWidth = MENU_WIDTH;
+			miea.ItemHeight = MENU_HEIGHT;
+		}
+
+		void MenuHelpOnDrawItem(object obj, DrawItemEventArgs e)
+		{
+			Graphics g = e.Graphics;
+			e.DrawBackground();
+			Rectangle bounds = e.Bounds;
+
+			Brush foreground = new SolidBrush(e.ForeColor);
+			Rectangle r = new Rectangle(bounds.Left + 4, bounds.Top + 4, 8, 8);
+			g.FillRectangle(new SolidBrush(color), r);
+			g.DrawRectangle(new Pen(foreground), r);
+			g.DrawString(name, e.Font, foreground, new PointF(bounds.Left + 20, bounds.Top));
+		}
+
+		void MenuHelpOnClick(object obj, EventArgs ea)
+		{
+			int factor = Properties.Settings.Default.LedBrightness;
+			int color = (this.color.R / factor) << 16 | (this.color.G / factor) << 8 | this.color.B / factor;
+			led.WriteColor(color);
 		}
 	}
 }

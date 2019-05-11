@@ -5,11 +5,70 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Management;
 using System.ComponentModel;
+using System.IO.Ports;
 
 namespace StateLight
 {
 	class LedConnection
 	{
+		/// <summary>
+		/// Serial Port to access the USB Device
+		/// </summary>
+		private SerialPort port = new SerialPort();
+
+		/// <summary>
+		/// Try to open the serial port
+		/// </summary>
+		private void OpenSerialPort()
+		{
+			string portName = FindLedComPort();
+			if (portName == null)
+			{
+				// TODO Mark status
+				Console.WriteLine("No device found");
+				return;
+			}
+
+			Console.WriteLine("Open COM Port " + portName);
+
+			port.PortName = portName;
+
+			// Baud rate doesen't matter, it's an USB Device
+			port.BaudRate = 9600;
+
+			// Set the read/write timeouts
+			port.ReadTimeout = 500;
+			port.WriteTimeout = 10;
+		}
+
+		public void WriteColor(int color)
+		{
+			WriteCommand("a" + string.Format("{0:X6}", color) + "\n");
+		}
+
+		private void WriteCommand(string command)
+		{
+			Console.WriteLine("Send Command to device: \"" + command + "\"");
+
+			try
+			{
+				if (!port.IsOpen)
+				{
+					OpenSerialPort();
+				}
+
+				port.Open();
+				port.Write(command);
+				string result = port.ReadLine();
+				Console.WriteLine("Device Respond: \"" + result + "\"");
+				port.Close();
+			}
+			catch (Exception ex)
+			{
+				port.Close();
+				Console.WriteLine(ex.ToString());
+			}
+		}
 
 		private static ConnectionOptions ProcessConnectionOptions()
 		{
@@ -38,7 +97,6 @@ namespace StateLight
 			ConnectionOptions options = ProcessConnectionOptions();
 			ManagementScope connectionScope = ConnectionScope(Environment.MachineName, options, @"\root\CIMV2");
 			ObjectQuery objectQuery = new ObjectQuery("SELECT * FROM Win32_PnPEntity WHERE ConfigManagerErrorCode = 0");
-			// ObjectQuery objectQuery = new ObjectQuery("SELECT * FROM Win32_SerialPort WHERE ConfigManagerErrorCode = 0");
 
 			using (ManagementObjectSearcher comPortSearcher = new ManagementObjectSearcher(connectionScope, objectQuery))
 			{
@@ -79,13 +137,13 @@ namespace StateLight
 						// Console.WriteLine("{0}={1}", name, value);
 					}
 
-					if (path.Contains("\\STATE_LED"))
+					if (!path.Contains("\\STATE_LED"))
 					{
 						continue;
 					}
 
 					string comPort = caption.Substring(caption.LastIndexOf("(COM") + 1);
-					return comPort.Substring(0, caption.LastIndexOf(')'));
+					return comPort.Substring(0, comPort.LastIndexOf(')'));
 				}
 			}
 
