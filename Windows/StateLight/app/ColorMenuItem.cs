@@ -7,8 +7,16 @@ using System.Windows.Forms;
 
 namespace StateLight.src
 {
+	/// <summary>
+	/// A single Popup Menu Entry
+	/// </summary>
 	class ColorMenuItem : MenuItem
 	{
+		/// <summary>
+		/// Main Controller
+		/// </summary>
+		private Controller controller;
+
 		/// <summary>
 		/// Menu Item Name
 		/// </summary>
@@ -24,12 +32,25 @@ namespace StateLight.src
 		/// </summary>
 		private LedConnection led;
 
+		/// <summary>
+		/// Menu size in Pixel
+		/// </summary>
 		private const int MENU_HEIGHT = 22;
+
+		/// <summary>
+		/// Menu size in Pixel
+		/// </summary>
 		private const int MENU_WIDTH = 150;
 
-		public ColorMenuItem(LedConnection led, string name, Color color) : base(name)
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="controller">Main Controller</param>
+		/// <param name="name">Menu Item Name</param>
+		/// <param name="color">Color</param>
+		public ColorMenuItem(Controller controller, string name, Color color) : base(name)
 		{
-			this.led = led;
+			this.controller = controller;
 			this.name = name;
 			this.color = color;
 
@@ -39,12 +60,22 @@ namespace StateLight.src
 			MeasureItem += new MeasureItemEventHandler(MenuHelpOnMeasureItem);
 		}
 
+		/// <summary>
+		/// Define size of Menu entry, which is painted by this class
+		/// </summary>
+		/// <param name="obj">Object</param>
+		/// <param name="miea">MeasureItemEventArgs</param>
 		void MenuHelpOnMeasureItem(object obj, MeasureItemEventArgs miea)
 		{
 			miea.ItemWidth = MENU_WIDTH;
 			miea.ItemHeight = MENU_HEIGHT;
 		}
 
+		/// <summary>
+		/// Draw Menu
+		/// </summary>
+		/// <param name="obj">Object</param>
+		/// <param name="e">DrawItemEventArgs</param>
 		void MenuHelpOnDrawItem(object obj, DrawItemEventArgs e)
 		{
 			Graphics g = e.Graphics;
@@ -58,11 +89,14 @@ namespace StateLight.src
 			g.DrawString(name, e.Font, foreground, new PointF(bounds.Left + 20, bounds.Top));
 		}
 
+		/// <summary>
+		/// Menu Entry selected
+		/// </summary>
+		/// <param name="obj">Object</param>
+		/// <param name="ea">EventArgs</param>
 		void MenuHelpOnClick(object obj, EventArgs ea)
 		{
-			int factor = Properties.Settings.Default.LedBrightness;
-			int color = (this.color.R / factor) << 16 | (this.color.G / factor) << 8 | this.color.B / factor;
-			led.WriteColor(color);
+			controller.SetColor(this.color);
 		}
 	}
 }

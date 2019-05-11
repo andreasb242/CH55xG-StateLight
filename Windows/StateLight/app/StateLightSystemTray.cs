@@ -13,6 +13,12 @@ namespace StateLight
 	class StateLightSystemTray : ApplicationContext
 	{
 		/// <summary>
+		/// Main Controller
+		/// </summary>
+		private Controller controller = new Controller();
+		public Controller Controller { get { return controller; } }
+
+		/// <summary>
 		/// Tray Icon
 		/// </summary>
 		private NotifyIcon trayIcon;
@@ -21,11 +27,6 @@ namespace StateLight
 		/// Menu
 		/// </summary>
 		private ContextMenu menu = new ContextMenu();
-
-		/// <summary>
-		/// LED Connection to the hardware
-		/// </summary>
-		private LedConnection led = new LedConnection();
 
 		public StateLightSystemTray()
 		{
@@ -36,6 +37,9 @@ namespace StateLight
 				ContextMenu = menu,
 				Visible = true
 			};
+
+			controller.TrayIcon = trayIcon;
+
 			trayIcon.MouseClick += (object sender, MouseEventArgs e) =>
 			{
 				if (e.Button != MouseButtons.Left)
@@ -43,10 +47,7 @@ namespace StateLight
 					return;
 				}
 
-				trayIcon.BalloonTipTitle = "State Light";
-				trayIcon.BalloonTipText = "Hier sollte der Gerätestatus stehen...";
-				trayIcon.BalloonTipIcon = ToolTipIcon.Info;
-				trayIcon.ShowBalloonTip(10000);
+				controller.IconClicked();
 			};
 
 			GenerateContextMenu();
@@ -55,13 +56,17 @@ namespace StateLight
 			menu.MenuItems.Add(new MenuItem("Exit", menuExit));
 		}
 
+		/// <summary>
+		/// Load context menu from config
+		/// </summary>
 		private void GenerateContextMenu()
 		{
 			foreach (string line in Properties.Settings.Default.States.Split('\n'))
 			{
 				string line2 = line.Trim();
-				if (line2.Equals(""))
+				if (line2.Equals("") || line.StartsWith("#"))
 				{
+					// Ignore empty lines or comments
 					continue;
 				}
 
@@ -69,16 +74,25 @@ namespace StateLight
 			}
 		}
 
+		/// <summary>
+		/// Parse a single line from config
+		/// </summary>
+		/// <param name="line"></param>
 		private void ParseLine(string line)
 		{
 			int pos = line.IndexOf(':');
 			string name = line.Substring(0, pos).Trim();
 			string color = line.Substring(pos + 1).Trim();
 
-			ColorMenuItem cm = new ColorMenuItem(led, name, System.Drawing.ColorTranslator.FromHtml(color));
+			ColorMenuItem cm = new ColorMenuItem(controller, name, System.Drawing.ColorTranslator.FromHtml(color));
 			menu.MenuItems.Add(cm);
 		}
 
+		/// <summary>
+		/// Menu Exit was pressed
+		/// </summary>
+		/// <param name="sender">Object</param>
+		/// <param name="e">EventArgs</param>
 		void menuExit(object sender, EventArgs e)
 		{
 			// Hide tray icon, otherwise it will remain shown until user mouses over it
