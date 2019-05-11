@@ -42,9 +42,19 @@ namespace StateLight.src
 		/// </summary>
 		public void IconClicked()
 		{
-			TrayIcon.BalloonTipTitle = "State Light";
-			TrayIcon.BalloonTipText = "Hier sollte der Gerätestatus stehen...";
-			TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
+			if (led.Connected)
+			{
+				TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
+				TrayIcon.BalloonTipTitle = "Verbunden";
+				TrayIcon.BalloonTipText = "State LED verbunden";
+			}
+			else
+			{
+				TrayIcon.BalloonTipIcon = ToolTipIcon.Error;
+				TrayIcon.BalloonTipTitle = "Fehler";
+				TrayIcon.BalloonTipText = led.ConnectionState;
+			}
+
 			TrayIcon.ShowBalloonTip(10000);
 		}
 	}

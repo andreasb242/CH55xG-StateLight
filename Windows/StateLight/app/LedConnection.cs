@@ -17,6 +17,16 @@ namespace StateLight
 		private SerialPort port = new SerialPort();
 
 		/// <summary>
+		/// Current connection state
+		/// </summary>
+		public bool Connected = false;
+
+		/// <summary>
+		/// Connection state
+		/// </summary>
+		public string ConnectionState = "Noch nicht verbunden";
+
+		/// <summary>
 		/// Try to open the serial port
 		/// </summary>
 		private void OpenSerialPort()
@@ -24,7 +34,9 @@ namespace StateLight
 			string portName = FindLedComPort();
 			if (portName == null)
 			{
-				// TODO Mark status
+				Connected = false;
+				ConnectionState = "Kein Gerät gefunden";
+
 				Console.WriteLine("No device found");
 				return;
 			}
@@ -61,12 +73,27 @@ namespace StateLight
 				port.Write(command);
 				string result = port.ReadLine();
 				Console.WriteLine("Device Respond: \"" + result + "\"");
+
+				if (result.Length >=2 && result.Substring(0, 2).Equals("OK"))
+				{
+					Connected = true;
+					ConnectionState = "Verbunden";
+				}
+				else
+				{
+					Connected = false;
+					ConnectionState = "Gerätefehler: " + result;
+				}
+
 				port.Close();
 			}
 			catch (Exception ex)
 			{
 				port.Close();
 				Console.WriteLine(ex.ToString());
+
+				Connected = false;
+				ConnectionState = "Kommunikationsfehler: " + ex.ToString();
 			}
 		}
 
