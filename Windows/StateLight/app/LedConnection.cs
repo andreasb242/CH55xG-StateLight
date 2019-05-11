@@ -58,7 +58,11 @@ namespace StateLight
 			WriteCommand("a" + string.Format("{0:X6}", color) + "\n");
 		}
 
-		private void WriteCommand(string command)
+		/// <summary>
+		/// Write a command to the LED, excpect OK as return
+		/// </summary>
+		/// <param name="command">Command to send</param>
+		public void WriteCommand(string command)
 		{
 			Console.WriteLine("Send Command to device: \"" + command + "\"");
 

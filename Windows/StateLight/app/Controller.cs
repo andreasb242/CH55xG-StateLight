@@ -41,7 +41,9 @@ namespace StateLight.src
 		/// </summary>
 		private void OnPingTimer(object sender, EventArgs e)
 		{
-			Console.WriteLine("ping timer");
+			// Communicate with the Controller, to make sure it don't get turn off
+			// Set the timeout to 2.5 second, and repeat this every second
+			led.WriteCommand("w250\n");
 		}
 
 		/// <summary>
