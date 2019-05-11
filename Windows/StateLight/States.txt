@@ -1,0 +1,3 @@
+﻿Verfügbar:001100
+Beschäftig:111100
+Test Blau:000011

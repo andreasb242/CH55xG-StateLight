@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateLight", "StateLight.csproj", "{343E1329-FE4A-4936-8087-7F776A625060}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{343E1329-FE4A-4936-8087-7F776A625060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{343E1329-FE4A-4936-8087-7F776A625060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{343E1329-FE4A-4936-8087-7F776A625060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{343E1329-FE4A-4936-8087-7F776A625060}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {12845616-D125-4A7B-B1FB-9FAD5CA5D8D2}
+	EndGlobalSection
+EndGlobal
