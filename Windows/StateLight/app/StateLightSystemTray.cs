@@ -53,7 +53,7 @@ namespace StateLight
 			GenerateContextMenu();
 
 			menu.MenuItems.Add("-");
-			menu.MenuItems.Add(new MenuItem("Exit", menuExit));
+			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));
 		}
 
 		/// <summary>
@@ -86,19 +86,6 @@ namespace StateLight
 
 			ColorMenuItem cm = new ColorMenuItem(controller, name, System.Drawing.ColorTranslator.FromHtml(color));
 			menu.MenuItems.Add(cm);
-		}
-
-		/// <summary>
-		/// Menu Exit was pressed
-		/// </summary>
-		/// <param name="sender">Object</param>
-		/// <param name="e">EventArgs</param>
-		void menuExit(object sender, EventArgs e)
-		{
-			// Hide tray icon, otherwise it will remain shown until user mouses over it
-			trayIcon.Visible = false;
-
-			Application.Exit();
 		}
 	}
 }

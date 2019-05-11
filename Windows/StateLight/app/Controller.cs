@@ -20,10 +20,41 @@ namespace StateLight.src
 		public NotifyIcon TrayIcon;
 
 		/// <summary>
+		/// Ping Timer, to make sure the device is connected and the device does not auto turn off
+		/// </summary>
+		private Timer pingTimer = new Timer
+		{
+			Interval = 1000
+		};
+
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		public Controller()
 		{
+			pingTimer.Enabled = true;
+			pingTimer.Tick += new System.EventHandler(OnPingTimer);
+		}
+
+		/// <summary>
+		/// Ping timer event
+		/// </summary>
+		private void OnPingTimer(object sender, EventArgs e)
+		{
+			Console.WriteLine("ping timer");
+		}
+
+		/// <summary>
+		/// Shutdown the application
+		/// </summary>
+		public void ShutdownApplication()
+		{
+			pingTimer.Stop();
+
+			// Hide tray icon, otherwise it will remain shown until user mouses over it
+			TrayIcon.Visible = false;
+
+			Application.Exit();
 		}
 
 		/// <summary>
