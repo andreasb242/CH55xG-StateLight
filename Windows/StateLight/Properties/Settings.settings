@@ -5,5 +5,8 @@
     <Setting Name="LedBrightness" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">7</Value>
     </Setting>
+    <Setting Name="UsbIdSearch" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\STATE_LED</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

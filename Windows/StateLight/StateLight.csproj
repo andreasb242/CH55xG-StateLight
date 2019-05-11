@@ -82,9 +82,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icon.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="icon.ico" />
     <Content Include="States.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

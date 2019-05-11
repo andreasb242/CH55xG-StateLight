@@ -137,7 +137,7 @@ namespace StateLight
 						// Console.WriteLine("{0}={1}", name, value);
 					}
 
-					if (!path.Contains("\\STATE_LED"))
+					if (!path.Contains(Properties.Settings.Default.UsbIdSearch))
 					{
 						continue;
 					}

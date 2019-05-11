@@ -34,5 +34,17 @@ namespace StateLight.Properties {
                 this["LedBrightness"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\STATE_LED")]
+        public string UsbIdSearch {
+            get {
+                return ((string)(this["UsbIdSearch"]));
+            }
+            set {
+                this["UsbIdSearch"] = value;
+            }
+        }
     }
 }
