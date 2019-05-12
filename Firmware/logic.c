@@ -162,7 +162,11 @@ void parserExecuteCommand() {
 		break;
 
 	case 'b':
-		g_LedBlink |= (1 << parserResult.a);
+		if (parserResult.a == 255) {
+			g_LedBlink = 0xff;
+		} else {
+			g_LedBlink |= (1 << parserResult.a);
+		}
 		break;
 
 	case 'c':
