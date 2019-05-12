@@ -73,7 +73,7 @@ namespace StateLight.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool WatchdogActive {
             get {
                 return ((bool)(this["WatchdogActive"]));
