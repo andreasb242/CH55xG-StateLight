@@ -49,14 +49,37 @@ namespace StateLight.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Verfügbar:#00FF00\r\nBeschäftig:#FFFF00\r\nAm Telefon:#FF0000\r\na:#FFFFFF\r\nb:#FF00FF\r\n" +
-            "c:#00FFFF\r\nd:#0000FF\r\ne:#FF7F00\r\nf:#3F3FFF")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"
+		 Verfügbar:#00FF00
+		 Beschäftig:#FFFF00
+		 Am Telefon:#FF0000
+		 Am Telefon blink:#FF0000b
+		 a:#FFFFFF
+		 b:#FF00FF
+		 c:#00FFFF
+		 d:#0000FF
+		 e:#FF7F00
+		 f:#3F3FFF
+		 Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
+		 Ausgeschaltet:#000000")]
         public string States {
             get {
                 return ((string)(this["States"]));
             }
             set {
                 this["States"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool WatchdogActive {
+            get {
+                return ((bool)(this["WatchdogActive"]));
+            }
+            set {
+                this["WatchdogActive"] = value;
             }
         }
     }

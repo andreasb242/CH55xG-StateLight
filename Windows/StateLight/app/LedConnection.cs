@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Management;
 using System.ComponentModel;
 using System.IO.Ports;
+using System.Runtime.CompilerServices;
 
 namespace StateLight
 {
@@ -53,15 +54,39 @@ namespace StateLight
 			port.WriteTimeout = 10;
 		}
 
-		public void WriteColor(int color)
+		/// <summary>
+		/// Write all LED Color
+		/// </summary>
+		/// <param name="color">Color</param>
+		public void WriteAllColor(int color)
 		{
 			WriteCommand("a" + string.Format("{0:X6}", color) + "\n");
+		}
+
+		/// <summary>
+		/// Write Color of single LED
+		/// </summary>
+		/// <param name="ledId">LED ID</param>
+		/// <param name="color">Color to write</param>
+		public void WriteLedColor(int ledId, int color)
+		{
+			WriteCommand("s" + ledId + " " + string.Format("{0:X6}", color) + "\n");
+		}
+
+		/// <summary>
+		/// Turn on blink for one or all LEDs
+		/// </summary>
+		/// <param name="ledId">LED ID, or 255 to blink all</param>
+		public void WriteBlink(int ledId)
+		{
+			WriteCommand("b" + ledId + "\n");
 		}
 
 		/// <summary>
 		/// Write a command to the LED, excpect OK as return
 		/// </summary>
 		/// <param name="command">Command to send</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void WriteCommand(string command)
 		{
 			Console.WriteLine("Send Command to device: \"" + command + "\"");
@@ -78,7 +103,7 @@ namespace StateLight
 				string result = port.ReadLine();
 				Console.WriteLine("Device Respond: \"" + result + "\"");
 
-				if (result.Length >=2 && result.Substring(0, 2).Equals("OK"))
+				if (result.Length >= 2 && result.Substring(0, 2).Equals("OK"))
 				{
 					Connected = true;
 					ConnectionState = "Verbunden";
