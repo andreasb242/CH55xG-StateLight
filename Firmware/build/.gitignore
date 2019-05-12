@@ -3,7 +3,6 @@
 *.rel
 *.rst
 *.sym
-*.bin
 *.hex
 *.ihex
 *.ihx

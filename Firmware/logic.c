@@ -117,7 +117,8 @@ void parserExecuteCommand() {
 	uint8_t v;
 
 	g_NextWatchdogTimeout = g_Timer + g_WatchdogTimeout;
-	if (g_LedsOn) {
+	if (!g_LedsOn) {
+		g_LedsOn = 1;
 		blinkLeds();
 	}
 
@@ -246,8 +247,7 @@ void logicLoop() {
 	}
 
 	// Handle sleep, if there is a timeout reached
-	diff = g_NextWatchdogTimeout - g_Timer;
-	if (g_WatchdogTimeout && (diff < 1 || diff > 2550)) {
+	if (g_WatchdogTimeout && g_NextWatchdogTimeout == g_Timer) {
 		g_LedsOn = 0;
 		blinkLeds();
 	}
