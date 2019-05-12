@@ -1,4 +1,5 @@
-﻿using StateLight.src;
+﻿using StateLight.app;
+using StateLight.src;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,6 +29,9 @@ namespace StateLight
 		/// </summary>
 		private ContextMenu menu = new ContextMenu();
 
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public StateLightSystemTray()
 		{
 			// Initialize Tray Icon
@@ -84,7 +88,9 @@ namespace StateLight
 			string name = line.Substring(0, pos).Trim();
 			string color = line.Substring(pos + 1).Trim();
 
-			ColorMenuItem cm = new ColorMenuItem(controller, name, System.Drawing.ColorTranslator.FromHtml(color));
+			ColorList cl = new ColorList(color);
+
+			ColorMenuItem cm = new ColorMenuItem(controller, name, cl);
 			menu.MenuItems.Add(cm);
 		}
 	}

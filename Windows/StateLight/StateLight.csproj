@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="app\ColorList.cs" />
     <Compile Include="app\ColorMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>

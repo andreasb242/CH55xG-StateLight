@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StateLight.app;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace StateLight.src
 		/// <summary>
 		/// Color
 		/// </summary>
-		private Color color;
+		private ColorList colorList;
 
 		/// <summary>
 		/// LED Connection to the hardware
@@ -47,12 +48,12 @@ namespace StateLight.src
 		/// </summary>
 		/// <param name="controller">Main Controller</param>
 		/// <param name="name">Menu Item Name</param>
-		/// <param name="color">Color</param>
-		public ColorMenuItem(Controller controller, string name, Color color) : base(name)
+		/// <param name="colorList">Color</param>
+		public ColorMenuItem(Controller controller, string name, ColorList colorList) : base(name)
 		{
 			this.controller = controller;
 			this.name = name;
-			this.color = color;
+			this.colorList = colorList;
 
 			OwnerDraw = true;
 			Click += new EventHandler(MenuHelpOnClick);
@@ -83,9 +84,8 @@ namespace StateLight.src
 			Rectangle bounds = e.Bounds;
 
 			Brush foreground = new SolidBrush(e.ForeColor);
-			Rectangle r = new Rectangle(bounds.Left + 4, bounds.Top + 4, 8, 8);
-			g.FillRectangle(new SolidBrush(color), r);
-			g.DrawRectangle(new Pen(foreground), r);
+
+			colorList.DrawIcon(g, foreground, bounds.Left, bounds.Top);
 			g.DrawString(name, e.Font, foreground, new PointF(bounds.Left + 20, bounds.Top));
 		}
 
@@ -96,7 +96,7 @@ namespace StateLight.src
 		/// <param name="ea">EventArgs</param>
 		void MenuHelpOnClick(object obj, EventArgs ea)
 		{
-			controller.SetColor(this.color);
+			controller.SetColor(this.colorList);
 		}
 	}
 }

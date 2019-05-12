@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StateLight.app;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace StateLight.src
 		/// </summary>
 		public Controller()
 		{
-			pingTimer.Enabled = true;
+			pingTimer.Enabled = Properties.Settings.Default.WatchdogActive;
 			pingTimer.Tick += new System.EventHandler(OnPingTimer);
 		}
 
@@ -62,12 +63,43 @@ namespace StateLight.src
 		/// <summary>
 		/// Write the Color to the device
 		/// </summary>
-		/// <param name="color">Color</param>
-		public void SetColor(Color color)
+		/// <param name="colorList">Color</param>
+		public void SetColor(ColorList colorList)
 		{
-			int factor = Properties.Settings.Default.LedBrightness;
-			int colorHex = (color.R / factor) << 16 | (color.G / factor) << 8 | color.B / factor;
-			led.WriteColor(colorHex);
+			Bitmap bmp = new Bitmap(16, 16);
+			using (Graphics g = Graphics.FromImage(bmp))
+			{
+				colorList.DrawIcon(g, new SolidBrush(Color.White), 0, 0);
+			}
+			TrayIcon.Icon = Icon.FromHandle(bmp.GetHicon());
+
+			if (colorList.Colors.Length == 1)
+			{
+				Color color = colorList.Colors[0];
+				int factor = Properties.Settings.Default.LedBrightness;
+				int colorHex = (color.R / factor) << 16 | (color.G / factor) << 8 | color.B / factor;
+				led.WriteAllColor(colorHex);
+
+				if (colorList.Blink[0])
+				{
+					led.WriteBlink(255);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < colorList.Colors.Length; i++)
+				{
+					Color color = colorList.Colors[i];
+					int factor = Properties.Settings.Default.LedBrightness;
+					int colorHex = (color.R / factor) << 16 | (color.G / factor) << 8 | color.B / factor;
+					led.WriteLedColor(i, colorHex);
+
+					if (colorList.Blink[i])
+					{
+						led.WriteBlink(i);
+					}
+				}
+			}
 		}
 
 		/// <summary>
