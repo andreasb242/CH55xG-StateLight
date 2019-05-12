@@ -8,23 +8,30 @@
     <Setting Name="UsbIdSearch" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\STATE_LED</Value>
     </Setting>
+    <Setting Name="WatchdogActive" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
     <Setting Name="States" Type="System.String" Scope="User">
       <Value Profile="(Default)">
 		 Verfügbar:#00FF00
 		 Beschäftig:#FFFF00
 		 Am Telefon:#FF0000
-		 Am Telefon blink:#FF0000b
-		 a:#FFFFFF
-		 b:#FF00FF
-		 c:#00FFFF
-		 d:#0000FF
-		 e:#FF7F00
-		 f:#3F3FFF
+		 Rot blinkend:#FF0000b
+		 Weiss:#FFFFFF
+		 Violet:#FF00FF
+		 Türkis:#00FFFF
+		 Blau:#0000FF
+		 Orange:#FF7F00
+		 Hellblau:#3F3FFF
 		 Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
+		 Rot/Grün:#FF0000-#FF0000-#00FF00-#00FF00-#FF0000-#FF0000
 		 Ausgeschaltet:#000000</Value>
     </Setting>
-    <Setting Name="WatchdogActive" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="MenuHeight" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">22</Value>
+    </Setting>
+    <Setting Name="MenuWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">150</Value>
     </Setting>
   </Settings>
 </SettingsFile>

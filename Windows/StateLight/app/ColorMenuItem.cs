@@ -34,16 +34,6 @@ namespace StateLight.src
 		private LedConnection led;
 
 		/// <summary>
-		/// Menu size in Pixel
-		/// </summary>
-		private const int MENU_HEIGHT = 22;
-
-		/// <summary>
-		/// Menu size in Pixel
-		/// </summary>
-		private const int MENU_WIDTH = 150;
-
-		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="controller">Main Controller</param>
@@ -68,8 +58,8 @@ namespace StateLight.src
 		/// <param name="miea">MeasureItemEventArgs</param>
 		void MenuHelpOnMeasureItem(object obj, MeasureItemEventArgs miea)
 		{
-			miea.ItemWidth = MENU_WIDTH;
-			miea.ItemHeight = MENU_HEIGHT;
+			miea.ItemWidth = Properties.Settings.Default.MenuWidth;
+			miea.ItemHeight = Properties.Settings.Default.MenuHeight;
 		}
 
 		/// <summary>

@@ -49,18 +49,31 @@ namespace StateLight.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool WatchdogActive {
+            get {
+                return ((bool)(this["WatchdogActive"]));
+            }
+            set {
+                this["WatchdogActive"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"
 		 Verfügbar:#00FF00
 		 Beschäftig:#FFFF00
 		 Am Telefon:#FF0000
-		 Am Telefon blink:#FF0000b
-		 a:#FFFFFF
-		 b:#FF00FF
-		 c:#00FFFF
-		 d:#0000FF
-		 e:#FF7F00
-		 f:#3F3FFF
+		 Rot blinkend:#FF0000b
+		 Weiss:#FFFFFF
+		 Violet:#FF00FF
+		 Türkis:#00FFFF
+		 Blau:#0000FF
+		 Orange:#FF7F00
+		 Hellblau:#3F3FFF
 		 Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
+		 Rot/Grün:#FF0000-#FF0000-#00FF00-#00FF00-#FF0000-#FF0000
 		 Ausgeschaltet:#000000")]
         public string States {
             get {
@@ -73,13 +86,25 @@ namespace StateLight.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool WatchdogActive {
+        [global::System.Configuration.DefaultSettingValueAttribute("22")]
+        public int MenuHeight {
             get {
-                return ((bool)(this["WatchdogActive"]));
+                return ((int)(this["MenuHeight"]));
             }
             set {
-                this["WatchdogActive"] = value;
+                this["MenuHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public int MenuWidth {
+            get {
+                return ((int)(this["MenuWidth"]));
+            }
+            set {
+                this["MenuWidth"] = value;
             }
         }
     }
