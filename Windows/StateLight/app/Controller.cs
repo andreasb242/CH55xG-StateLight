@@ -1,4 +1,5 @@
 ﻿using StateLight.app;
+using StateLightPluginDef;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +9,7 @@ using System.Windows.Forms;
 
 namespace StateLight.src
 {
-	class Controller
+	class Controller : IStateProvider
 	{
 		/// <summary>
 		/// LED Connection to the hardware
@@ -19,6 +20,11 @@ namespace StateLight.src
 		/// Tray Icon
 		/// </summary>
 		public NotifyIcon TrayIcon;
+
+		/// <summary>
+		/// Plugin handler list
+		/// </summary>
+		public Plugins plugins = new Plugins();
 
 		/// <summary>
 		/// Ping Timer, to make sure the device is connected and the device does not auto turn off
@@ -33,6 +39,8 @@ namespace StateLight.src
 		/// </summary>
 		public Controller()
 		{
+			plugins.loadPluginList();
+
 			pingTimer.Enabled = Properties.Settings.Default.WatchdogActive;
 			pingTimer.Tick += new System.EventHandler(OnPingTimer);
 		}
@@ -58,6 +66,12 @@ namespace StateLight.src
 			TrayIcon.Visible = false;
 
 			Application.Exit();
+		}
+
+		public void WriteState(string state, string additional)
+		{
+			// TODO Implement
+			Console.WriteLine("=>" + state + " | " + additional);
 		}
 
 		/// <summary>

@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateLight", "StateLight.csproj", "{343E1329-FE4A-4936-8087-7F776A625060}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateLightPluginDef", "..\StateLightPluginDef\StateLightPluginDef.csproj", "{3E5342DD-762E-41CF-9371-FB612C278D47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyStatusGui", "..\DummyStatusGui\DummyStatusGui.csproj", "{9C3D03D2-406F-4022-AD23-314196CE744F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{343E1329-FE4A-4936-8087-7F776A625060}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{343E1329-FE4A-4936-8087-7F776A625060}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{343E1329-FE4A-4936-8087-7F776A625060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E5342DD-762E-41CF-9371-FB612C278D47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E5342DD-762E-41CF-9371-FB612C278D47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E5342DD-762E-41CF-9371-FB612C278D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E5342DD-762E-41CF-9371-FB612C278D47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C3D03D2-406F-4022-AD23-314196CE744F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C3D03D2-406F-4022-AD23-314196CE744F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C3D03D2-406F-4022-AD23-314196CE744F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C3D03D2-406F-4022-AD23-314196CE744F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
