@@ -1,5 +1,6 @@
 ﻿using StateLight.app;
 using StateLight.src;
+using StateLightPluginDef;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -55,6 +56,22 @@ namespace StateLight
 			};
 
 			GenerateContextMenu();
+
+			bool separatorAdded = false;
+
+			foreach(IStateLightPluginDef p in controller.Plugins.PluginList)
+			{
+				if (!separatorAdded)
+				{
+					menu.MenuItems.Add("-");
+					separatorAdded = true;
+				}
+
+				MenuItem pm = new MenuItem(p.DisplayName(), (object sender, EventArgs e) => { Console.WriteLine("Plugin called"); });
+				pm.Text = "☑ " + pm.Text;
+				menu.MenuItems.Add(pm);
+			}
+
 
 			menu.MenuItems.Add("-");
 			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));

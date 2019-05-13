@@ -30,7 +30,8 @@ namespace StateLight
 		/// <summary>
 		/// Try to open the serial port
 		/// </summary>
-		private void OpenSerialPort()
+		/// <returns>true if opened</returns>
+		private bool OpenSerialPort()
 		{
 			string portName = FindLedComPort();
 			if (portName == null)
@@ -39,7 +40,7 @@ namespace StateLight
 				ConnectionState = "Kein Gerät gefunden";
 
 				Console.WriteLine("No device found");
-				return;
+				return false;
 			}
 
 			Console.WriteLine("Open COM Port " + portName);
@@ -52,6 +53,7 @@ namespace StateLight
 			// Set the read/write timeouts
 			port.ReadTimeout = 500;
 			port.WriteTimeout = 10;
+			return true;
 		}
 
 		/// <summary>
@@ -95,7 +97,10 @@ namespace StateLight
 			{
 				if (!port.IsOpen)
 				{
-					OpenSerialPort();
+					if (!OpenSerialPort())
+					{
+						return;
+					}
 				}
 
 				port.Open();

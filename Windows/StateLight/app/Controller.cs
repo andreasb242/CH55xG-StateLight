@@ -27,6 +27,11 @@ namespace StateLight.src
 		public Plugins plugins = new Plugins();
 
 		/// <summary>
+		/// Plugin handler list
+		/// </summary>
+		public Plugins Plugins { get { return plugins; } }
+
+		/// <summary>
 		/// Ping Timer, to make sure the device is connected and the device does not auto turn off
 		/// </summary>
 		private Timer pingTimer = new Timer
@@ -39,7 +44,7 @@ namespace StateLight.src
 		/// </summary>
 		public Controller()
 		{
-			plugins.loadPluginList();
+			plugins.LoadPluginList();
 
 			pingTimer.Enabled = Properties.Settings.Default.WatchdogActive;
 			pingTimer.Tick += new System.EventHandler(OnPingTimer);
@@ -52,7 +57,14 @@ namespace StateLight.src
 		{
 			// Communicate with the Controller, to make sure it don't get turn off
 			// Set the timeout to 2.5 second, and repeat this every second
-			led.WriteCommand("w250\n");
+			try
+			{
+				led.WriteCommand("w250\n");
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+			}
 		}
 
 		/// <summary>
