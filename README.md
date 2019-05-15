@@ -11,61 +11,82 @@ Basically working on Linux, no Messenger sync yet
 This is the Target protocol, not 100% ready.
 
 >Sended Text
-$ Received Text
+
+>$ Received Text
+
 All Texts are are terminated with \n, \r or Both (don't matter)
 
 Normal Sequence:
 >i
-$TODO
+
+>$TODO
+
 Check if Version is correct.
 
 Set all LEDs:
 >aRRGGBB
-$OK
+
+>$OK
+
 RRGGBB is an RGB Hex Color
 This will turn off blink.
 
 Set single LED:
 >sID RRGGBB
-$OK
+
+>$OK
+
 ID is the LED ID, starting from 0, decimal
 RRGGBB is an RGB Hex Color
 This will turn off blink.
 
 Set auto off time after XXX Seconds
 >aXXX
-$OK
+
+>$OK
+
 If there is no command received within XXX Seconds, turn off LEDs
 
 Ping:
 >p
-$OK
+
+>$OK
+
 Used to prevent auto turn off
 
 Blink:
 >tXXX
-$OK
+
+>$OK
+
 Set blink time to TTT * 100ms
 Defaults to 5, => 500ms blink time.
 
 >b255
-$OK
+
+>$OK
+
 Blink all LEDs
 
 >bID
-$OK
+
+>$OK
+
 Blink LED ID, ID is decimal
 
 Write config byte:
 >caaa vvv
-$OK
+
+>$OK
 
 aaa Address: decimal, 0 .. 127
 vvv Value: decimal, 0 .. 255
 
 Read config byte:
 >raaa
-$OK vvv
+
+>$OK vvv
+
 aaa Address: decimal, 0 .. 127
 vvv Value: decimal, 0 .. 255
 

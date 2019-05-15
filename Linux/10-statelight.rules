@@ -1,2 +1,2 @@
-ACTION=="add", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="27dd", ATTRS{product}=="State Light", SYMLINK+="statelight"
+ACTION=="add", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="27dd", ATTRS{serial}=="State LED", SYMLINK+="statelight"
 

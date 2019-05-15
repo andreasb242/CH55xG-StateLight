@@ -16,7 +16,7 @@ def main():
 			ok, result = send_command("r%i\n" % i);
 			if result[:2] != "OK":
 				print("Failed to read EEPROM at address %d" % i)
-				print(result)
+				print(">" + result + "<")
 				return
 
 			d = int(result[2:])

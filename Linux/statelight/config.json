@@ -12,5 +12,33 @@
 	},
 	"led": {
 		"brightness": 7
+	},
+	"pidgin": {
+		"enabled": "true",
+		"mapping": {
+			"default": {
+				"*": {
+					"color": "FF00FF"
+				}
+			},
+			"available": {
+				"*": {
+					"color": "00FF00"
+				}
+			},
+			"unavailable": {
+				"*": {
+					"color": "FF0000"
+				}
+			},
+			"away": {
+				"*": {
+					"color": "FFFF00"
+				},
+				"Ich bin gerade nicht hier": {
+					"color": "FFFFFF"
+				}
+			}
+		}
 	}
 }
