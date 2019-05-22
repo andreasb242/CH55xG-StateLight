@@ -21,6 +21,12 @@ namespace StateLight.src
 		/// </summary>
 		public NotifyIcon TrayIcon;
 
+
+		/// <summary>
+		/// System Tray, to get Plugin menu and disable them (should be handled over Plugin class, but simpler this way)
+		/// </summary>
+		public StateLightSystemTray SystemTray;
+
 		/// <summary>
 		/// Plugin handler list
 		/// </summary>
@@ -82,8 +88,20 @@ namespace StateLight.src
 
 		public void WriteState(string state, string additional)
 		{
-			// TODO Implement
-			Console.WriteLine("=>" + state + " | " + additional);
+			Console.WriteLine("Plugin state changed: " + state + " | " + additional);
+
+			////// TODO MAP STATE
+		}
+
+
+		/// <summary>
+		/// Write the Color to the device, disable all plugins
+		/// </summary>
+		/// <param name="colorList">Color</param>
+		public void SetManualColor(ColorList colorList)
+		{
+			SystemTray.DisableAllPluginMenus();
+			SetColor(colorList);
 		}
 
 		/// <summary>

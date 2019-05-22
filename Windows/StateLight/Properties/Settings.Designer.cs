@@ -61,31 +61,6 @@ namespace StateLight.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"
-		 Verfügbar:#00FF00
-		 Beschäftig:#FFFF00
-		 Am Telefon:#FF0000
-		 Rot blinkend:#FF0000b
-		 Weiss:#FFFFFF
-		 Violet:#FF00FF
-		 Türkis:#00FFFF
-		 Blau:#0000FF
-		 Orange:#FF7F00
-		 Hellblau:#3F3FFF
-		 Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
-		 Rot/Grün:#FF0000-#FF0000-#00FF00-#00FF00-#FF0000-#FF0000
-		 Ausgeschaltet:#000000")]
-        public string States {
-            get {
-                return ((string)(this["States"]));
-            }
-            set {
-                this["States"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("22")]
         public int MenuHeight {
             get {
@@ -105,6 +80,46 @@ namespace StateLight.Properties {
             }
             set {
                 this["MenuWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"
+          Verfügbar:#00FF00
+          Beschäftig:#FFFF00
+          Am Telefon:#FF0000
+          Rot blinkend:#FF0000b
+          Weiss:#FFFFFF
+          Violet:#FF00FF
+          Türkis:#00FFFF
+          Blau:#0000FF
+          Orange:#FF7F00
+          Hellblau:#3F3FFF
+          Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
+          Rot/Grün:#FF0000-#FF0000-#00FF00-#00FF00-#FF0000-#FF0000
+          Ausgeschaltet:#000000
+        ")]
+        public string States {
+            get {
+                return ((string)(this["States"]));
+            }
+            set {
+                this["States"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\r\n          Free:#00FF00\r\n          FreeIdle:#00FF00\r\n          Busy:#FFFF00\r\n   " +
+            "       BusyIdle:#FFFF00\r\n          DoNotDisturb:#FF0000\r\n          Away:#0000FF\r" +
+            "\n          TemporarilyAway:#0000FF\r\n          Offline:#FFFFFF\r\n        ")]
+        public string StateMapping {
+            get {
+                return ((string)(this["StateMapping"]));
+            }
+            set {
+                this["StateMapping"] = value;
             }
         }
     }

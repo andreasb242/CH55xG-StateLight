@@ -1,4 +1,5 @@
-﻿using StateLight.app;
+﻿using StateLight.src;
+using StateLightPluginDef;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -6,12 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace StateLight.src
+namespace StateLight.app
 {
-	/// <summary>
-	/// A single Popup Menu Entry
-	/// </summary>
-	class ColorMenuItem : MenuItem
+	class PluginMenuItem : MenuItem
 	{
 		/// <summary>
 		/// Main Controller
@@ -19,14 +17,9 @@ namespace StateLight.src
 		private Controller controller;
 
 		/// <summary>
-		/// Menu Item Name
+		/// Plugin
 		/// </summary>
-		private String name;
-
-		/// <summary>
-		/// Color
-		/// </summary>
-		private ColorList colorList;
+		private IStateLightPluginDef plugin;
 
 		/// <summary>
 		/// LED Connection to the hardware
@@ -34,16 +27,19 @@ namespace StateLight.src
 		private LedConnection led;
 
 		/// <summary>
+		/// Plugin enabled / disabled
+		/// </summary>
+		private bool enabled = false;
+
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="controller">Main Controller</param>
-		/// <param name="name">Menu Item Name</param>
-		/// <param name="colorList">Color</param>
-		public ColorMenuItem(Controller controller, string name, ColorList colorList) : base(name)
+		/// <param name="plugin">Plugin</param>
+		public PluginMenuItem(Controller controller, IStateLightPluginDef plugin) : base(plugin.DisplayName())
 		{
 			this.controller = controller;
-			this.name = name;
-			this.colorList = colorList;
+			this.plugin = plugin;
 
 			OwnerDraw = true;
 			Click += new EventHandler(MenuOnClick);
@@ -75,8 +71,37 @@ namespace StateLight.src
 
 			Brush foreground = new SolidBrush(e.ForeColor);
 
-			colorList.DrawIcon(g, foreground, bounds.Left, bounds.Top);
-			g.DrawString(name, e.Font, foreground, new PointF(bounds.Left + 20, bounds.Top));
+			if (enabled)
+			{
+				Pen pen = new Pen(foreground, 2);
+				g.DrawLine(pen, bounds.Left + 0, bounds.Top + 10, bounds.Left + 6, bounds.Top + 16);
+				g.DrawLine(pen, bounds.Left + 6, bounds.Top + 16, bounds.Left + 16, bounds.Top + 0);
+			}
+
+			g.DrawString(plugin.DisplayName(), e.Font, foreground, new PointF(bounds.Left + 20, bounds.Top));
+		}
+
+		/// <summary>
+		/// Enable the menu and the plugin
+		/// </summary>
+		/// <param name="enabled"></param>
+		public void SetEnabled(bool enabled)
+		{
+			if (this.enabled == enabled)
+			{
+				return;
+			}
+
+			this.enabled = enabled;
+
+			if (enabled)
+			{
+				plugin.Start(controller);
+			}
+			else
+			{
+				plugin.Stop();
+			}
 		}
 
 		/// <summary>
@@ -86,7 +111,7 @@ namespace StateLight.src
 		/// <param name="ea">EventArgs</param>
 		void MenuOnClick(object obj, EventArgs ea)
 		{
-			controller.SetManualColor(this.colorList);
+			SetEnabled(true);
 		}
 	}
 }

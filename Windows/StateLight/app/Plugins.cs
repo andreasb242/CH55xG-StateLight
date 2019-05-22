@@ -52,16 +52,21 @@ namespace StateLight.app
                 pluginList = (
                     // From each file in the files.
                     from file in pluginFiles
-                        // Load the assembly.
-                let asm = Assembly.LoadFile(file)
-                // For every type in the assembly that is visible outside of
-                // the assembly.
-                from type in asm.GetExportedTypes()
+                    
+                    // Load the assembly.
+                    let asm = Assembly.LoadFile(file)
+
+                    // For every type in the assembly that is visible outside of
+                    // the assembly.
+                    from type in asm.GetExportedTypes()
+                    
                     // Where the type implements the interface.
-                where typeof(IStateLightPluginDef).IsAssignableFrom(type)
-                // Create the instance.
-                select (IStateLightPluginDef)Activator.CreateInstance(type)
-                // Materialize to an array.
+                    where typeof(IStateLightPluginDef).IsAssignableFrom(type)
+                    
+                    // Create the instance.
+                    select (IStateLightPluginDef)Activator.CreateInstance(type)
+                    
+                    // Materialize to an array.
                 ).ToArray();
             }
             catch (Exception e)

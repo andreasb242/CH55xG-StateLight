@@ -2,6 +2,7 @@
 using StateLight.src;
 using StateLightPluginDef;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -31,6 +32,11 @@ namespace StateLight
 		private ContextMenu menu = new ContextMenu();
 
 		/// <summary>
+		/// Plugin menu items
+		/// </summary>
+		private List<PluginMenuItem> pluginMenuItems = new List<PluginMenuItem>();
+
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		public StateLightSystemTray()
@@ -44,6 +50,7 @@ namespace StateLight
 			};
 
 			controller.TrayIcon = trayIcon;
+			controller.SystemTray = this;
 
 			trayIcon.MouseClick += (object sender, MouseEventArgs e) =>
 			{
@@ -59,7 +66,7 @@ namespace StateLight
 
 			bool separatorAdded = false;
 
-			foreach(IStateLightPluginDef p in controller.Plugins.PluginList)
+			foreach (IStateLightPluginDef p in controller.Plugins.PluginList)
 			{
 				if (!separatorAdded)
 				{
@@ -67,14 +74,25 @@ namespace StateLight
 					separatorAdded = true;
 				}
 
-				MenuItem pm = new MenuItem(p.DisplayName(), (object sender, EventArgs e) => { Console.WriteLine("Plugin called"); });
-				pm.Text = "☑ " + pm.Text;
+				PluginMenuItem pm = new PluginMenuItem(controller, p);
 				menu.MenuItems.Add(pm);
+				pluginMenuItems.Add(pm);
 			}
 
 
 			menu.MenuItems.Add("-");
 			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));
+		}
+
+		/// <summary>
+		/// Disable all Plugin menus
+		/// </summary>
+		public void DisableAllPluginMenus()
+		{
+			foreach (PluginMenuItem it in pluginMenuItems)
+			{
+				it.SetEnabled(false);
+			}
 		}
 
 		/// <summary>

@@ -57,6 +57,9 @@
     </Compile>
     <Compile Include="app\Controller.cs" />
     <Compile Include="app\LedConnection.cs" />
+    <Compile Include="app\PluginMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="app\Plugins.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="app\StateLightSystemTray.cs" />
