@@ -55,6 +55,7 @@
     <Compile Include="app\ColorMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="app\ConfigParser.cs" />
     <Compile Include="app\Controller.cs" />
     <Compile Include="app\LedConnection.cs" />
     <Compile Include="app\PluginMenuItem.cs">

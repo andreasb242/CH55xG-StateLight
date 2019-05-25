@@ -62,7 +62,7 @@ namespace StateLight
 		/// <param name="color">Color</param>
 		public void WriteAllColor(int color)
 		{
-			WriteCommand("a" + string.Format("{0:X6}", color) + "\n");
+			WriteCommand("a" + string.Format("{0:X6}", color));
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace StateLight
 		/// <param name="color">Color to write</param>
 		public void WriteLedColor(int ledId, int color)
 		{
-			WriteCommand("s" + ledId + " " + string.Format("{0:X6}", color) + "\n");
+			WriteCommand("s" + ledId + " " + string.Format("{0:X6}", color));
 		}
 
 		/// <summary>
@@ -81,7 +81,15 @@ namespace StateLight
 		/// <param name="ledId">LED ID, or 255 to blink all</param>
 		public void WriteBlink(int ledId)
 		{
-			WriteCommand("b" + ledId + "\n");
+			WriteCommand("b" + ledId);
+		}
+
+		/// <summary>
+		/// Write Ping and sets timeout, so the device turns of if there is no ping anymore
+		/// </summary>
+		public void WritePing()
+		{
+			WriteCommand("w250");
 		}
 
 		/// <summary>
@@ -89,7 +97,7 @@ namespace StateLight
 		/// </summary>
 		/// <param name="command">Command to send</param>
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public void WriteCommand(string command)
+		private void WriteCommand(string command)
 		{
 			Console.WriteLine("Send Command to device: \"" + command + "\"");
 
@@ -104,8 +112,11 @@ namespace StateLight
 				}
 
 				port.Open();
+
+				command += "\n";
 				port.Write(command);
 				string result = port.ReadLine();
+				result = result.Trim();
 				Console.WriteLine("Device Respond: \"" + result + "\"");
 
 				if (result.Length >= 2 && result.Substring(0, 2).Equals("OK"))
@@ -124,6 +135,7 @@ namespace StateLight
 			catch (Exception ex)
 			{
 				port.Close();
+				Console.WriteLine("Kommunikationsfehler");
 				Console.WriteLine(ex.ToString());
 
 				Connected = false;

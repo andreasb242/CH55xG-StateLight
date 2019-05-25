@@ -21,11 +21,15 @@ namespace StateLight.src
 		/// </summary>
 		public NotifyIcon TrayIcon;
 
-
 		/// <summary>
 		/// System Tray, to get Plugin menu and disable them (should be handled over Plugin class, but simpler this way)
 		/// </summary>
 		public StateLightSystemTray SystemTray;
+
+		/// <summary>
+		/// State mapping for Plugins
+		/// </summary>
+		private ConfigParser pluginStateMapping = new ConfigParser(Properties.Settings.Default.StateMapping);
 
 		/// <summary>
 		/// Plugin handler list
@@ -65,10 +69,11 @@ namespace StateLight.src
 			// Set the timeout to 2.5 second, and repeat this every second
 			try
 			{
-				led.WriteCommand("w250\n");
+				led.WritePing();
 			}
 			catch (Exception ex)
 			{
+				Console.WriteLine("Exception in Ping");
 				Console.WriteLine(ex.ToString());
 			}
 		}
@@ -86,11 +91,31 @@ namespace StateLight.src
 			Application.Exit();
 		}
 
+		/// <summary>
+		/// Plugin Callback
+		/// </summary>
+		/// <param name="state">State</param>
+		/// <param name="additional">Additonal Data</param>
 		public void WriteState(string state, string additional)
 		{
-			Console.WriteLine("Plugin state changed: " + state + " | " + additional);
+			string s = state;
+			if (!additional.Equals(""))
+			{
+				s += ".";
+				s += additional;
+			}
 
-			////// TODO MAP STATE
+			Console.WriteLine("Plugin state changed: " + s);
+
+			ColorList color = null;
+			pluginStateMapping.Values.TryGetValue(s, out color);
+			if (color == null)
+			{
+				Console.WriteLine("Plugin state \"" + s + "\" is unknown");
+				return;
+			}
+
+			SetColor(color);
 		}
 
 
