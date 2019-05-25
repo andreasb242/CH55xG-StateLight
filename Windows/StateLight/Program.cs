@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using System.Globalization;
+using System.Threading;
 
 namespace StateLight
 {
@@ -32,6 +33,11 @@ namespace StateLight
 				RedirectLog();
 			}
 
+			Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+
+
+
 			Console.WriteLine("** Startup **");
 			Console.WriteLine(DateTime.Now.ToString(new CultureInfo("de-DE")));
 
@@ -48,6 +54,18 @@ namespace StateLight
 			{
 				ostrm.Close();
 			}
+		}
+
+		static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+		{
+			Console.WriteLine("Unhandled Exception");
+			Console.WriteLine(e.Exception.ToString());
+		}
+
+		static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			Console.WriteLine("Unhandled Exception");
+			Console.WriteLine((e.ExceptionObject as Exception).ToString());
 		}
 
 		/// <summary>

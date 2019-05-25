@@ -82,6 +82,17 @@ namespace StateLight
 
 			menu.MenuItems.Add("-");
 			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));
+
+
+			if (Properties.Settings.Default.AutostartPlugin)
+			{
+				foreach (PluginMenuItem it in pluginMenuItems)
+				{
+					// First Plugin enabled
+					it.SetEnabled(true);
+					return;
+				}
+			}
 		}
 
 		/// <summary>
