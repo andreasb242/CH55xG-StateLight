@@ -6,6 +6,8 @@ using System.Text;
 using Microsoft.Lync.Model;
 using StateLightPluginDef;
 
+
+// TODO Handle incomming calls: https://stackoverflow.com/questions/9207549/detecting-an-incoming-call-in-lync
 namespace Lync2010Plugin
 {
 	public class Lync2010PluginImpl : IStateLightPluginDef
