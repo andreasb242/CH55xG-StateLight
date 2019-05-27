@@ -81,6 +81,8 @@ namespace StateLight
 
 
 			menu.MenuItems.Add("-");
+			menu.MenuItems.Add("Version 1.0.1");
+			menu.MenuItems.Add("-");
 			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));
 
 

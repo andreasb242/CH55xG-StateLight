@@ -51,19 +51,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="app\ColorList.cs" />
-    <Compile Include="app\ColorMenuItem.cs">
+    <Compile Include="app\config\ColorList.cs" />
+    <Compile Include="app\controller\ColorMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="app\ConfigParser.cs" />
-    <Compile Include="app\Controller.cs" />
-    <Compile Include="app\LedConnection.cs" />
-    <Compile Include="app\PluginMenuItem.cs">
+    <Compile Include="app\config\ConfigParser.cs" />
+    <Compile Include="app\controller\Controller.cs" />
+    <Compile Include="app\hw\LedConnection.cs" />
+    <Compile Include="app\controller\PluginMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="app\Plugins.cs" />
+    <Compile Include="app\controller\Plugins.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="app\StateLightSystemTray.cs" />
+    <Compile Include="app\controller\StateLightSystemTray.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
