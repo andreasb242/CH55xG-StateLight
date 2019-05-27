@@ -84,6 +84,7 @@ namespace StateLight.src
 		public void ShutdownApplication()
 		{
 			pingTimer.Stop();
+			led.Stop();
 
 			// Hide tray icon, otherwise it will remain shown until user mouses over it
 			TrayIcon.Visible = false;

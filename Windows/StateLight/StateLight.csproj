@@ -57,14 +57,16 @@
     </Compile>
     <Compile Include="app\config\ConfigParser.cs" />
     <Compile Include="app\controller\Controller.cs" />
+    <Compile Include="app\hw\ComPortFinder.cs" />
     <Compile Include="app\hw\LedConnection.cs" />
     <Compile Include="app\controller\PluginMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="app\controller\Plugins.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="app\base\Settings.cs" />
     <Compile Include="app\controller\StateLightSystemTray.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="app\base\Program.cs" />
+    <Compile Include="app\hw\SerialCommandQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -135,5 +135,29 @@ namespace StateLight.Properties {
                 this["AutostartPlugin"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int serialTimeoutRead {
+            get {
+                return ((int)(this["serialTimeoutRead"]));
+            }
+            set {
+                this["serialTimeoutRead"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int serialTimeoutWrite {
+            get {
+                return ((int)(this["serialTimeoutWrite"]));
+            }
+            set {
+                this["serialTimeoutWrite"] = value;
+            }
+        }
     }
 }
