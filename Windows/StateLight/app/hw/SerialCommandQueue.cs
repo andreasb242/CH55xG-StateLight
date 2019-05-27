@@ -127,13 +127,13 @@ namespace StateLight.app.hw
 				{
 					if (!OpenSerialPort())
 					{
+						Console.WriteLine("Failed to open COM Port");
 						cmd.ResultListener.CommandResult(false, "Kein Gerät gefunden");
 						return;
 					}
 				}
 
-				port.Open();
-
+				Console.WriteLine("Write Command to device: \"" + cmd.Command + "\"");
 				string command = cmd.Command + "\n";
 				port.Write(command);
 				string result = port.ReadLine();
@@ -148,8 +148,6 @@ namespace StateLight.app.hw
 				{
 					cmd.ResultListener.CommandResult(false, "Gerätefehler: " + result);
 				}
-
-				port.Close();
 			}
 			catch (Exception ex)
 			{
@@ -203,6 +201,9 @@ namespace StateLight.app.hw
 			// Set the read/write timeouts
 			port.ReadTimeout = Properties.Settings.Default.serialTimeoutRead;
 			port.WriteTimeout = Properties.Settings.Default.serialTimeoutWrite;
+
+			port.Open();
+
 			return true;
 		}
 
