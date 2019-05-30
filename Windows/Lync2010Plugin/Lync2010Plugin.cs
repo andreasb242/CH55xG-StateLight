@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading;
 using Microsoft.Lync.Model;
+using Microsoft.Lync.Model.Conversation;
 using StateLightPluginDef;
 
-
-// TODO Handle incomming calls: https://stackoverflow.com/questions/9207549/detecting-an-incoming-call-in-lync
 namespace Lync2010Plugin
 {
 	public class Lync2010PluginImpl : IStateLightPluginDef
@@ -91,11 +90,38 @@ namespace Lync2010Plugin
 			catch (ClientNotFoundException)
 			{
 				Console.WriteLine("Lync not running");
+				return;
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("Exception connection lync: " + e.ToString());
+				return;
 			}
+
+			// Source: https://stackoverflow.com/questions/9207549/detecting-an-incoming-call-in-lync
+
+			foreach (var conv in lyncClient.ConversationManager.Conversations)
+			{
+				conv.Modalities[ModalityTypes.AudioVideo].ModalityStateChanged += new EventHandler<ModalityStateChangedEventArgs>(AVModalityStateChanged);
+			}
+
+			lyncClient.ConversationManager.ConversationAdded += ConversationManager_ConversationAdded;
+		}
+
+		/// <summary>
+		/// New Conversation added
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void ConversationManager_ConversationAdded(object sender, Microsoft.Lync.Model.Conversation.ConversationManagerEventArgs e)
+		{
+			e.Conversation.Modalities[ModalityTypes.AudioVideo].ModalityStateChanged += AVModalityStateChanged;
+		}
+
+		void AVModalityStateChanged(object sender, ModalityStateChangedEventArgs e)
+		{
+			Console.WriteLine("AVModalityStateChanged");
+			SendState();
 		}
 
 		public void Start(IStateProvider state)
@@ -158,6 +184,25 @@ namespace Lync2010Plugin
 			{
 				callback.WriteState("signed-out", "");
 				return;
+			}
+
+			foreach (var conv in lyncClient.ConversationManager.Conversations)
+			{
+				ModalityState state = conv.Modalities[ModalityTypes.AudioVideo].State;
+
+				if (state == ModalityState.Notified)
+				{
+					callback.WriteState("call-calling", "");
+					return;
+				}
+				if (state == ModalityState.Connecting
+					|| state == ModalityState.Connected
+					|| state == ModalityState.Joining
+					|| state == ModalityState.ConnectingToCaller)
+				{
+					callback.WriteState("call-connected", "");
+					return;
+				}
 			}
 
 			ContactAvailability currentAvailability = (ContactAvailability)lyncClient.Self.Contact.GetContactInformation(ContactInformationType.Availability);
