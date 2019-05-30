@@ -5,6 +5,7 @@ using StateLightPluginDef;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,6 +17,11 @@ namespace StateLight
 {
 	class StateLightSystemTray : ApplicationContext
 	{
+		/// <summary>
+		/// Version of the application
+		/// </summary>
+		private string FILE_VERSION = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+
 		/// <summary>
 		/// Main Controller
 		/// </summary>
@@ -82,7 +88,7 @@ namespace StateLight
 
 
 			menu.MenuItems.Add("-");
-			menu.MenuItems.Add("Version 1.0.1");
+			menu.MenuItems.Add("Version " + FILE_VERSION);
 			menu.MenuItems.Add("-");
 			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));
 

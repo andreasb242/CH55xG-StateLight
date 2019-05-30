@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+using System.Threading;
 using Microsoft.Lync.Model;
 using StateLightPluginDef;
 
@@ -12,6 +9,11 @@ namespace Lync2010Plugin
 {
 	public class Lync2010PluginImpl : IStateLightPluginDef
 	{
+		/// <summary>
+		/// Timeout
+		/// </summary>
+		private const int CONNECT_TIMEOUT = 5000;
+
 		/// <summary>
 		/// Client, set in constructor if found
 		/// </summary>
@@ -28,11 +30,45 @@ namespace Lync2010Plugin
 		private IStateProvider callback;
 
 		/// <summary>
+		/// Timer to connect lync, if lync is not running on startup
+		/// </summary>
+		private Timer connectTimer;
+
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		public Lync2010PluginImpl()
 		{
 			ConnectLyncClient();
+
+			if (lyncClient == null)
+			{
+				connectTimer = new Timer(OnConnectTimer, null, CONNECT_TIMEOUT, Timeout.Infinite);
+			}
+		}
+
+		/// <summary>
+		/// Try to connect lync
+		/// </summary>
+		public void OnConnectTimer(Object state)
+		{
+			Console.WriteLine("Lync connect Timer");
+
+			ConnectLyncClient();
+
+			if (lyncClient == null)
+			{
+				connectTimer.Change(CONNECT_TIMEOUT, Timeout.Infinite);
+			}
+			else
+			{
+				Console.WriteLine("Lync is started up - connected!");
+
+				connectTimer.Dispose();
+
+				// If enabled: Send state
+				SendState();
+			}
 		}
 
 		/// <summary>
@@ -123,7 +159,6 @@ namespace Lync2010Plugin
 				callback.WriteState("signed-out", "");
 				return;
 			}
-
 
 			ContactAvailability currentAvailability = (ContactAvailability)lyncClient.Self.Contact.GetContactInformation(ContactInformationType.Availability);
 
