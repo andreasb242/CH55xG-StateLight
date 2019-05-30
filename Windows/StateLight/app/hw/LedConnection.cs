@@ -14,6 +14,17 @@ namespace StateLight
 	class LedConnection : ICmdResult
 	{
 		/// <summary>
+		/// Event if the device is connected / unconnected
+		/// </summary>
+		/// <param name="connected"></param>
+		public delegate void dgLedConnectionStateChanged(bool connected);
+
+		/// <summary>
+		/// Event if the device is connected / unconnected
+		/// </summary>
+		public event dgLedConnectionStateChanged OnDeviceConnected;
+
+		/// <summary>
 		/// Queue to Queue commands
 		/// </summary>
 		private SerialCommandQueue queue = new SerialCommandQueue();
@@ -87,6 +98,11 @@ namespace StateLight
 		/// <param name="state">User readable message</param>
 		public void CommandResult(bool connected, string state)
 		{
+			if (this.Connected != connected && OnDeviceConnected != null)
+			{
+				OnDeviceConnected(connected);
+			}
+
 			this.Connected = connected;
 			this.ConnectionState = state;
 		}

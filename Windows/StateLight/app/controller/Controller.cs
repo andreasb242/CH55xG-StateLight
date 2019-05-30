@@ -43,6 +43,11 @@ namespace StateLight.src
 		public Plugins Plugins { get { return plugins; } }
 
 		/// <summary>
+		/// Last set color
+		/// </summary>
+		private ColorList lastColorList = null;
+
+		/// <summary>
 		/// Ping Timer, to make sure the device is connected and the device does not auto turn off
 		/// </summary>
 		private Timer pingTimer = new Timer
@@ -59,6 +64,20 @@ namespace StateLight.src
 
 			pingTimer.Enabled = Properties.Settings.Default.WatchdogActive;
 			pingTimer.Tick += new System.EventHandler(OnPingTimer);
+
+			led.OnDeviceConnected += OnDeviceConnected;
+		}
+
+		/// <summary>
+		/// Connection state of the device has changed
+		/// </summary>
+		/// <param name="connected"></param>
+		private void OnDeviceConnected(bool connected)
+		{
+			if (connected && lastColorList != null)
+			{
+				WriteColorToLed(lastColorList);
+			}
 		}
 
 		/// <summary>
@@ -138,6 +157,8 @@ namespace StateLight.src
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void SetColor(ColorList colorList)
 		{
+			lastColorList = colorList;
+
 			Bitmap bmp = new Bitmap(16, 16);
 			using (Graphics g = Graphics.FromImage(bmp))
 			{
@@ -145,6 +166,14 @@ namespace StateLight.src
 			}
 			TrayIcon.Icon = Icon.FromHandle(bmp.GetHicon());
 
+			WriteColorToLed(colorList);
+		}
+
+		/// <summary>
+		/// Write the current color to the LED
+		/// </summary>
+		private void WriteColorToLed(ColorList colorList)
+		{
 			if (colorList.Colors.Length == 1)
 			{
 				Color color = colorList.Colors[0];
