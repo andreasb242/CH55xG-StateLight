@@ -1,11 +1,14 @@
-﻿using StateLightPluginDef;
+﻿using StateLight.app.controller;
+using StateLightPluginDef;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace StateLight.app
 {
@@ -17,12 +20,12 @@ namespace StateLight.app
 		/// <summary>
 		/// Array with all loaded Plugins
 		/// </summary>
-		private List<IStateLightPluginDef> pluginList = new List<IStateLightPluginDef>();
+		private List<PluginWrapper> pluginList = new List<PluginWrapper>();
 
 		/// <summary>
 		/// Array with all loaded Plugins
 		/// </summary>
-		public List<IStateLightPluginDef> PluginList { get { return pluginList; } }
+		public List<PluginWrapper> PluginList { get { return pluginList; } }
 
 		/// <summary>
 		/// Constructor
@@ -36,51 +39,36 @@ namespace StateLight.app
 		/// </summary>
 		public void LoadPluginList()
 		{
-			String path = Application.StartupPath + "\\plugin";
-            if (!Directory.Exists(path))
-            {
-                Console.WriteLine("Plugin folder \"" + path + "\" does not exist");
-                return;
-            }
-
-			string[] pluginFiles = Directory.GetFiles(path, "*Plugin.dll");
-
-            IStateLightPluginDef[] pluginList = { };
-
-            try
-            {
-                pluginList = (
-                    // From each file in the files.
-                    from file in pluginFiles
-                    
-                    // Load the assembly.
-                    let asm = Assembly.LoadFile(file)
-
-                    // For every type in the assembly that is visible outside of
-                    // the assembly.
-                    from type in asm.GetExportedTypes()
-                    
-                    // Where the type implements the interface.
-                    where typeof(IStateLightPluginDef).IsAssignableFrom(type)
-                    
-                    // Create the instance.
-                    select (IStateLightPluginDef)Activator.CreateInstance(type)
-                    
-                    // Materialize to an array.
-                ).ToArray();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception loading plugin: " + e.ToString());
-            }
-
-            foreach (IStateLightPluginDef p in pluginList)
+			String path = Application.StartupPath + "\\Plugin";
+			if (!Directory.Exists(path))
 			{
-				Console.WriteLine("Load Plugin: \"" + p.GetDetails() + "\", supported: " + p.IsSupported());
+				Console.WriteLine("Plugin folder \"" + path + "\" does not exist");
+				return;
+			}
 
-				if (p.IsSupported())
+			foreach (string p in Directory.GetDirectories(path))
+			{
+				string pluginXml = p + "/plugin.xml";
+				if (!File.Exists(pluginXml))
 				{
-					this.pluginList.Add(p);
+					continue;
+				}
+
+				try
+				{
+					PluginWrapper plugin = new PluginWrapper(pluginXml);
+					if (!plugin.IsSupported())
+					{
+						Console.WriteLine("Plugin \"" + plugin.GetDetails() + "\" is not supported");
+						continue;
+					}
+
+					Console.WriteLine("Plugin \"" + plugin.GetDetails() + "\" loaded");
+					this.pluginList.Add(plugin);
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine("Exception loading plugin: " + e.ToString());
 				}
 			}
 		}

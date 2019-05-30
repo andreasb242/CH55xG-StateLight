@@ -62,22 +62,6 @@ namespace Lync2010Plugin
 			}
 		}
 
-
-		public bool IsSupported()
-		{
-			return lyncClient != null;
-		}
-
-		public string GetDetails()
-		{
-			return "Lync 2010 Plugin, Andreas Butti, 2019";
-		}
-
-		public string DisplayName()
-		{
-			return "Lync 2010";
-		}
-
 		public void Start(IStateProvider state)
 		{
 			callback = state;
@@ -127,6 +111,12 @@ namespace Lync2010Plugin
 				return;
 			}
 
+
+			if (lyncClient == null)
+			{
+				callback.WriteState("not-running", "");
+				return;
+			}
 
 			if (lyncClient.State != ClientState.SignedIn)
 			{

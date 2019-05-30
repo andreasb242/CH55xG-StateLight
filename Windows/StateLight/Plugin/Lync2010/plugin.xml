@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<plugin>
+	<name>Lync 2010</name>
+	<info>Lync 2010 Plugin, Copyright © 2019 Andreas Butti</info>
+	<path>../../../Lync2010Plugin/bin/Debug/Lync2010Plugin.dll</path>
+
+	<!-- Checks, if one of those are true, the plugin is loaded-->
+	<check>
+		<file>C:\Program Files (x86)\Microsoft Lync\communicator.exe</file>
+		<metadata name="description">Microsoft Lync 2010</metadata>
+	</check>
+</plugin>

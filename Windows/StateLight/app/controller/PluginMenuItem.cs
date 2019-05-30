@@ -1,4 +1,5 @@
-﻿using StateLight.src;
+﻿using StateLight.app.controller;
+using StateLight.src;
 using StateLightPluginDef;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace StateLight.app
 		/// <summary>
 		/// Plugin
 		/// </summary>
-		private IStateLightPluginDef plugin;
+		private PluginWrapper plugin;
 
 		/// <summary>
 		/// LED Connection to the hardware
@@ -36,7 +37,7 @@ namespace StateLight.app
 		/// </summary>
 		/// <param name="controller">Main Controller</param>
 		/// <param name="plugin">Plugin</param>
-		public PluginMenuItem(Controller controller, IStateLightPluginDef plugin) : base(plugin.DisplayName())
+		public PluginMenuItem(Controller controller, PluginWrapper plugin) : base(plugin.DisplayName())
 		{
 			this.controller = controller;
 			this.plugin = plugin;

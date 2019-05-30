@@ -1,4 +1,5 @@
 ﻿using StateLight.app;
+using StateLight.app.controller;
 using StateLight.src;
 using StateLightPluginDef;
 using System;
@@ -66,7 +67,7 @@ namespace StateLight
 
 			bool separatorAdded = false;
 
-			foreach (IStateLightPluginDef p in controller.Plugins.PluginList)
+			foreach (PluginWrapper p in controller.Plugins.PluginList)
 			{
 				if (!separatorAdded)
 				{

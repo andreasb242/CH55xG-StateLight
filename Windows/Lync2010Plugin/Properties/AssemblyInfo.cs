@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("Lync2010Plugin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Lync 2010 Integration PLugin")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Andreas Butti")]
 [assembly: AssemblyProduct("Lync2010Plugin")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright © 2019 Andreas Butti")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
