@@ -7,6 +7,7 @@
 import json
 import serial
 from struct import pack
+import time
 
 
 def main():
@@ -38,6 +39,7 @@ def send_command(cmd):
 	try:
 		serialPort.write(cmd.encode())
 		serialPort.flush()
+		time.sleep(0.01)
 		result = serialPort.readline().decode().strip()
 	except BaseException as e:
 		return False, "Exception " + str(e)
