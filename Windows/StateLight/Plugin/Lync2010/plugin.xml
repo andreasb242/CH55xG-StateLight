@@ -2,7 +2,7 @@
 <plugin>
 	<name>Lync 2010</name>
 	<info>Lync 2010 Plugin, Copyright © 2019 Andreas Butti</info>
-	<path>../../../Lync2010Plugin/bin/Debug/Lync2010Plugin.dll</path>
+	<path>../../../../../../Lync2010Plugin/bin/Debug/Lync2010Plugin.dll</path>
 
 	<!-- Checks, if one of those are true, the plugin is loaded-->
 	<check>

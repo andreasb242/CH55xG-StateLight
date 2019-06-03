@@ -106,9 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
-    <Content Include="PluginDeploy\Lync2010\plugin.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="PluginDeploy\Lync2010\plugin.xml" />
     <Content Include="Plugin\Lync2010\plugin.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
