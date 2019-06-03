@@ -85,7 +85,8 @@ namespace StateLight.app.controller
 			}
 
 			string path = pluginNode.SelectSingleNode("path").InnerText;
-			this.dllLoadingPath = new FileInfo(xmlPath + "\\" + path).Directory.FullName;
+			string xmlDir = new FileInfo(xmlPath).Directory.FullName;
+			this.dllLoadingPath = new FileInfo(xmlDir + "\\" + path).Directory.FullName;
 
 			Console.WriteLine("Plugin Load Path: " + this.dllLoadingPath);
 
