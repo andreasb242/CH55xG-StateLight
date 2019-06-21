@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -22,6 +23,16 @@ namespace StateLight.src
 		public NotifyIcon TrayIcon;
 
 		/// <summary>
+		/// System Tray, to get Plugin menu and disable them (should be handled over Plugin class, but simpler this way)
+		/// </summary>
+		public StateLightSystemTray SystemTray;
+
+		/// <summary>
+		/// State mapping for Plugins
+		/// </summary>
+		private ConfigParser pluginStateMapping = new ConfigParser(Properties.Settings.Default.StateMapping);
+
+		/// <summary>
 		/// Plugin handler list
 		/// </summary>
 		public Plugins plugins = new Plugins();
@@ -30,6 +41,11 @@ namespace StateLight.src
 		/// Plugin handler list
 		/// </summary>
 		public Plugins Plugins { get { return plugins; } }
+
+		/// <summary>
+		/// Last set color
+		/// </summary>
+		private ColorList lastColorList = null;
 
 		/// <summary>
 		/// Ping Timer, to make sure the device is connected and the device does not auto turn off
@@ -48,6 +64,20 @@ namespace StateLight.src
 
 			pingTimer.Enabled = Properties.Settings.Default.WatchdogActive;
 			pingTimer.Tick += new System.EventHandler(OnPingTimer);
+
+			led.OnDeviceConnected += OnDeviceConnected;
+		}
+
+		/// <summary>
+		/// Connection state of the device has changed
+		/// </summary>
+		/// <param name="connected"></param>
+		private void OnDeviceConnected(bool connected)
+		{
+			if (connected && lastColorList != null)
+			{
+				WriteColorToLed(lastColorList);
+			}
 		}
 
 		/// <summary>
@@ -59,10 +89,11 @@ namespace StateLight.src
 			// Set the timeout to 2.5 second, and repeat this every second
 			try
 			{
-				led.WriteCommand("w250\n");
+				led.WritePing();
 			}
 			catch (Exception ex)
 			{
+				Console.WriteLine("Exception in Ping");
 				Console.WriteLine(ex.ToString());
 			}
 		}
@@ -73,6 +104,7 @@ namespace StateLight.src
 		public void ShutdownApplication()
 		{
 			pingTimer.Stop();
+			led.Stop();
 
 			// Hide tray icon, otherwise it will remain shown until user mouses over it
 			TrayIcon.Visible = false;
@@ -80,18 +112,53 @@ namespace StateLight.src
 			Application.Exit();
 		}
 
+		/// <summary>
+		/// Plugin Callback
+		/// </summary>
+		/// <param name="state">State</param>
+		/// <param name="additional">Additonal Data</param>
 		public void WriteState(string state, string additional)
 		{
-			// TODO Implement
-			Console.WriteLine("=>" + state + " | " + additional);
+			string s = state;
+			if (!additional.Equals(""))
+			{
+				s += ".";
+				s += additional;
+			}
+
+			Console.WriteLine("Plugin state changed: " + s);
+
+			ColorList color = null;
+			pluginStateMapping.Values.TryGetValue(s, out color);
+			if (color == null)
+			{
+				Console.WriteLine("Plugin state \"" + s + "\" is unknown");
+				return;
+			}
+
+			SetColor(color);
+		}
+
+
+		/// <summary>
+		/// Write the Color to the device, disable all plugins
+		/// </summary>
+		/// <param name="colorList">Color</param>
+		public void SetManualColor(ColorList colorList)
+		{
+			SystemTray.DisableAllPluginMenus();
+			SetColor(colorList);
 		}
 
 		/// <summary>
 		/// Write the Color to the device
 		/// </summary>
 		/// <param name="colorList">Color</param>
+		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void SetColor(ColorList colorList)
 		{
+			lastColorList = colorList;
+
 			Bitmap bmp = new Bitmap(16, 16);
 			using (Graphics g = Graphics.FromImage(bmp))
 			{
@@ -99,6 +166,14 @@ namespace StateLight.src
 			}
 			TrayIcon.Icon = Icon.FromHandle(bmp.GetHicon());
 
+			WriteColorToLed(colorList);
+		}
+
+		/// <summary>
+		/// Write the current color to the LED
+		/// </summary>
+		private void WriteColorToLed(ColorList colorList)
+		{
 			if (colorList.Colors.Length == 1)
 			{
 				Color color = colorList.Colors[0];

@@ -46,9 +46,9 @@ namespace StateLight.src
 			this.colorList = colorList;
 
 			OwnerDraw = true;
-			Click += new EventHandler(MenuHelpOnClick);
-			DrawItem += new DrawItemEventHandler(MenuHelpOnDrawItem);
-			MeasureItem += new MeasureItemEventHandler(MenuHelpOnMeasureItem);
+			Click += new EventHandler(MenuOnClick);
+			DrawItem += new DrawItemEventHandler(MenuOnDrawItem);
+			MeasureItem += new MeasureItemEventHandler(MenuOnMeasureItem);
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace StateLight.src
 		/// </summary>
 		/// <param name="obj">Object</param>
 		/// <param name="miea">MeasureItemEventArgs</param>
-		void MenuHelpOnMeasureItem(object obj, MeasureItemEventArgs miea)
+		void MenuOnMeasureItem(object obj, MeasureItemEventArgs miea)
 		{
 			miea.ItemWidth = Properties.Settings.Default.MenuWidth;
 			miea.ItemHeight = Properties.Settings.Default.MenuHeight;
@@ -67,7 +67,7 @@ namespace StateLight.src
 		/// </summary>
 		/// <param name="obj">Object</param>
 		/// <param name="e">DrawItemEventArgs</param>
-		void MenuHelpOnDrawItem(object obj, DrawItemEventArgs e)
+		void MenuOnDrawItem(object obj, DrawItemEventArgs e)
 		{
 			Graphics g = e.Graphics;
 			e.DrawBackground();
@@ -84,9 +84,9 @@ namespace StateLight.src
 		/// </summary>
 		/// <param name="obj">Object</param>
 		/// <param name="ea">EventArgs</param>
-		void MenuHelpOnClick(object obj, EventArgs ea)
+		void MenuOnClick(object obj, EventArgs ea)
 		{
-			controller.SetColor(this.colorList);
+			controller.SetManualColor(this.colorList);
 		}
 	}
 }

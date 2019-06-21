@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("DummyStatusGui")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Lync2010Plugin")]
+[assembly: AssemblyDescription("Lync 2010 Integration PLugin")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DummyStatusGui")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCompany("Andreas Butti")]
+[assembly: AssemblyProduct("Lync2010Plugin")]
+[assembly: AssemblyCopyright("Copyright © 2019 Andreas Butti")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
-[assembly: Guid("9c3d03d2-406f-4022-ad23-314196ce744f")]
+[assembly: Guid("b9bf7d24-4b20-4f78-84f7-1d857b321e04")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
 //

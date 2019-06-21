@@ -11,6 +11,21 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -51,16 +66,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="app\ColorList.cs" />
-    <Compile Include="app\ColorMenuItem.cs">
+    <Compile Include="app\config\ColorList.cs" />
+    <Compile Include="app\controller\ColorMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="app\Controller.cs" />
-    <Compile Include="app\LedConnection.cs" />
-    <Compile Include="app\Plugins.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="app\StateLightSystemTray.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="app\config\ConfigParser.cs" />
+    <Compile Include="app\controller\Controller.cs" />
+    <Compile Include="app\controller\PluginWrapper.cs" />
+    <Compile Include="app\hw\ComPortFinder.cs" />
+    <Compile Include="app\hw\LedConnection.cs" />
+    <Compile Include="app\controller\PluginMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="app\controller\Plugins.cs" />
+    <Compile Include="app\base\Settings.cs" />
+    <Compile Include="app\controller\StateLightSystemTray.cs" />
+    <Compile Include="app\base\Program.cs" />
+    <Compile Include="app\hw\SerialCommandQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -84,12 +106,26 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="PluginDeploy\Lync2010\plugin.xml" />
+    <Content Include="Plugin\Lync2010\plugin.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StateLightPluginDef\StateLightPluginDef.csproj">
       <Project>{3e5342dd-762e-41cf-9371-fb612c278d47}</Project>
       <Name>StateLightPluginDef</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Plugin\Lync2013\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

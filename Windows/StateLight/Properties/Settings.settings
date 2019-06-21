@@ -11,27 +11,50 @@
     <Setting Name="WatchdogActive" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="States" Type="System.String" Scope="User">
-      <Value Profile="(Default)">
-		 Verfügbar:#00FF00
-		 Beschäftig:#FFFF00
-		 Am Telefon:#FF0000
-		 Rot blinkend:#FF0000b
-		 Weiss:#FFFFFF
-		 Violet:#FF00FF
-		 Türkis:#00FFFF
-		 Blau:#0000FF
-		 Orange:#FF7F00
-		 Hellblau:#3F3FFF
-		 Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
-		 Rot/Grün:#FF0000-#FF0000-#00FF00-#00FF00-#FF0000-#FF0000
-		 Ausgeschaltet:#000000</Value>
-    </Setting>
     <Setting Name="MenuHeight" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">22</Value>
     </Setting>
     <Setting Name="MenuWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">150</Value>
+    </Setting>
+    <Setting Name="States" Type="System.String" Scope="User">
+      <Value Profile="(Default)">
+					Verfügbar:#00FF00
+					Beschäftig:#FFFF00
+					Am Telefon:#FF0000
+					Rot blinkend:#FF0000b
+					Weiss:#FFFFFF
+					Violet:#FF00FF
+					Türkis:#00FFFF
+					Blau:#0000FF
+					Orange:#FF7F00
+					Hellblau:#3F3FFF
+					Farbtest:#FF0000-#00FF00-#0000FF-#FFFF00-#FFFFFFb-#FF00FF
+					Rot/Grün:#FF0000-#FF0000-#00FF00-#00FF00-#FF0000-#FF0000
+					Ausgeschaltet:#000000
+				</Value>
+    </Setting>
+    <Setting Name="StateMapping" Type="System.String" Scope="User">
+      <Value Profile="(Default)">
+					Free:#00FF00
+					FreeIdle:#00FF00
+					Busy:#FFFF00
+					BusyIdle:#FFFF00
+					DoNotDisturb:#FF0000
+					Away:#0000FF
+					TemporarilyAway:#0000FF
+					Offline:#FFFFFF
+					signed-out:#555555-#555555-#00FF00-#FF0000-#555555-#555555
+				</Value>
+    </Setting>
+    <Setting Name="AutostartPlugin" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="serialTimeoutRead" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="serialTimeoutWrite" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
     </Setting>
   </Settings>
 </SettingsFile>

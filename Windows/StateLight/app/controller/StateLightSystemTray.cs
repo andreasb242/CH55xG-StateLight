@@ -1,8 +1,11 @@
 ﻿using StateLight.app;
+using StateLight.app.controller;
 using StateLight.src;
 using StateLightPluginDef;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -14,6 +17,11 @@ namespace StateLight
 {
 	class StateLightSystemTray : ApplicationContext
 	{
+		/// <summary>
+		/// Version of the application
+		/// </summary>
+		private string FILE_VERSION = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+
 		/// <summary>
 		/// Main Controller
 		/// </summary>
@@ -31,6 +39,11 @@ namespace StateLight
 		private ContextMenu menu = new ContextMenu();
 
 		/// <summary>
+		/// Plugin menu items
+		/// </summary>
+		private List<PluginMenuItem> pluginMenuItems = new List<PluginMenuItem>();
+
+		/// <summary>
 		/// Constructor
 		/// </summary>
 		public StateLightSystemTray()
@@ -44,6 +57,7 @@ namespace StateLight
 			};
 
 			controller.TrayIcon = trayIcon;
+			controller.SystemTray = this;
 
 			trayIcon.MouseClick += (object sender, MouseEventArgs e) =>
 			{
@@ -59,7 +73,7 @@ namespace StateLight
 
 			bool separatorAdded = false;
 
-			foreach(IStateLightPluginDef p in controller.Plugins.PluginList)
+			foreach (PluginWrapper p in controller.Plugins.PluginList)
 			{
 				if (!separatorAdded)
 				{
@@ -67,14 +81,38 @@ namespace StateLight
 					separatorAdded = true;
 				}
 
-				MenuItem pm = new MenuItem(p.DisplayName(), (object sender, EventArgs e) => { Console.WriteLine("Plugin called"); });
-				pm.Text = "☑ " + pm.Text;
+				PluginMenuItem pm = new PluginMenuItem(controller, p);
 				menu.MenuItems.Add(pm);
+				pluginMenuItems.Add(pm);
 			}
 
 
 			menu.MenuItems.Add("-");
+			menu.MenuItems.Add("Version " + FILE_VERSION);
+			menu.MenuItems.Add("-");
 			menu.MenuItems.Add(new MenuItem("Exit", (object sender, EventArgs e) => { controller.ShutdownApplication(); }));
+
+
+			if (Properties.Settings.Default.AutostartPlugin)
+			{
+				foreach (PluginMenuItem it in pluginMenuItems)
+				{
+					// First Plugin enabled
+					it.SetEnabled(true);
+					return;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Disable all Plugin menus
+		/// </summary>
+		public void DisableAllPluginMenus()
+		{
+			foreach (PluginMenuItem it in pluginMenuItems)
+			{
+				it.SetEnabled(false);
+			}
 		}
 
 		/// <summary>
@@ -82,33 +120,13 @@ namespace StateLight
 		/// </summary>
 		private void GenerateContextMenu()
 		{
-			foreach (string line in Properties.Settings.Default.States.Split('\n'))
+			ConfigParser cfg = new ConfigParser(Properties.Settings.Default.States);
+			foreach (KeyValuePair<string, ColorList> e in cfg.Values)
 			{
-				string line2 = line.Trim();
-				if (line2.Equals("") || line.StartsWith("#"))
-				{
-					// Ignore empty lines or comments
-					continue;
-				}
-
-				ParseLine(line2);
+				ColorMenuItem cm = new ColorMenuItem(controller, e.Key, e.Value);
+				menu.MenuItems.Add(cm);
 			}
 		}
 
-		/// <summary>
-		/// Parse a single line from config
-		/// </summary>
-		/// <param name="line"></param>
-		private void ParseLine(string line)
-		{
-			int pos = line.IndexOf(':');
-			string name = line.Substring(0, pos).Trim();
-			string color = line.Substring(pos + 1).Trim();
-
-			ColorList cl = new ColorList(color);
-
-			ColorMenuItem cm = new ColorMenuItem(controller, name, cl);
-			menu.MenuItems.Add(cm);
-		}
 	}
 }

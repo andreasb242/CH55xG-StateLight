@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateLight", "StateLight.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StateLightPluginDef", "..\StateLightPluginDef\StateLightPluginDef.csproj", "{3E5342DD-762E-41CF-9371-FB612C278D47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyStatusGui", "..\DummyStatusGui\DummyStatusGui.csproj", "{9C3D03D2-406F-4022-AD23-314196CE744F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lync2010Plugin", "..\Lync2010Plugin\Lync2010Plugin.csproj", "{B9BF7D24-4B20-4F78-84F7-1D857B321E04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{3E5342DD-762E-41CF-9371-FB612C278D47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E5342DD-762E-41CF-9371-FB612C278D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E5342DD-762E-41CF-9371-FB612C278D47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9C3D03D2-406F-4022-AD23-314196CE744F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C3D03D2-406F-4022-AD23-314196CE744F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C3D03D2-406F-4022-AD23-314196CE744F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C3D03D2-406F-4022-AD23-314196CE744F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9BF7D24-4B20-4F78-84F7-1D857B321E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9BF7D24-4B20-4F78-84F7-1D857B321E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9BF7D24-4B20-4F78-84F7-1D857B321E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9BF7D24-4B20-4F78-84F7-1D857B321E04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

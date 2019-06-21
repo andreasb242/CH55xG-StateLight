@@ -24,24 +24,6 @@ namespace StateLightPluginDef
 	public interface IStateLightPluginDef
 	{
 		/// <summary>
-		/// Checks if this plugin is supported (e.g. if the client is installed, which should be loaded)
-		/// </summary>
-		/// <returns>true if yes</returns>
-		bool IsSupported();
-
-		/// <summary>
-		/// Get Plugin details, for Debugging or for about dialog
-		/// </summary>
-		/// <returns>Author, Version etc.</returns>
-		string GetDetails();
-
-		/// <summary>
-		/// Name to display in the Menu
-		/// </summary>
-		/// <returns>Menu String</returns>
-		string DisplayName();
-
-		/// <summary>
 		/// Start upadting the status
 		/// </summary>
 		/// <param name="state">State Provider</param>
