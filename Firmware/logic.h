@@ -23,3 +23,8 @@ void updateLeds();
  * Load colors from EEPROM, if valid data is there
  */
 void loadColorsFromEeprom();
+
+/**
+ * Turn OFF all LEDs, until an USB Command is received
+ */
+void turnOffLeds();

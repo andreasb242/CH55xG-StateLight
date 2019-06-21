@@ -124,7 +124,7 @@ void parserExecuteCommand() {
 
 	switch (parserResult.cmd) {
 	case 'i':
-		UsbCdc_puts("Ampel 1.0,protocol: 2,Andreas Butti - 2019\r\n");
+		UsbCdc_puts("Ampel 1.1,protocol: 2,Andreas Butti - 2019\r\n");
 		return;
 
 	case 'a':
@@ -238,6 +238,14 @@ void blinkLeds() {
 }
 
 /**
+ * Turn OFF all LEDs, until an USB Command is received
+ */
+void turnOffLeds() {
+	g_LedsOn = 0;
+	blinkLeds();
+}
+
+/**
  * Called from the main loop
  */
 void logicLoop() {
@@ -252,8 +260,7 @@ void logicLoop() {
 
 	// Handle sleep, if there is a timeout reached
 	if (g_WatchdogTimeout && g_NextWatchdogTimeout == g_Timer) {
-		g_LedsOn = 0;
-		blinkLeds();
+		turnOffLeds();
 	}
 }
 

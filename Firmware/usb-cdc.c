@@ -129,6 +129,10 @@ inline void usbWakeupSuspendInterrupt() {
 		while (XBUS_AUX & bUART0_TX) {
 			; // Waiting for transmission to complete
 		}
+
+		// Before turning of the CPU turn OFF the LEDs
+		turnOffLeds();
+
 		SAFE_MOD = 0x55;
 		SAFE_MOD = 0xAA;
 
