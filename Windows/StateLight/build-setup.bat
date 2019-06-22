@@ -19,6 +19,11 @@ COPY ..\Lync2010Plugin\bin\Release\Lync2010Plugin.dll setup_data\Plugin\Lync2010
 COPY ..\Lync2010Plugin\SDK\*.dll setup_data\Plugin\Lync2010\
 COPY PluginDeploy\Lync2010\*.xml setup_data\Plugin\Lync2010\
 
+mkdir setup_data\Plugin\Lync2013
+COPY ..\Lync2013Plugin\bin\Release\Lync2013Plugin.dll setup_data\Plugin\Lync2013\
+COPY ..\Lync2013Plugin\SDK\*.dll setup_data\Plugin\Lync2013\
+COPY PluginDeploy\Lync2013\*.xml setup_data\Plugin\Lync2013\
+
 
 echo Packe files...
 cd setup_data
