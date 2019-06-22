@@ -120,7 +120,9 @@ namespace StateLight.app.controller
 		{
 			string[] tokens = e.Name.Split(",".ToCharArray());
 			System.Diagnostics.Debug.WriteLine("Resolving: " + e.Name);
-			return Assembly.LoadFile(Path.Combine(new string[] { dllLoadingPath, tokens[0] + ".dll" }));
+			string fullPath = Path.Combine(new string[] { dllLoadingPath, tokens[0] + ".dll" });
+			System.Diagnostics.Debug.WriteLine("Path: " + fullPath);
+			return Assembly.LoadFile(fullPath);
 		}
 
 		/// <summary>

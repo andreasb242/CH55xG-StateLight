@@ -39,10 +39,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>SDK\Microsoft.Lync.Utilities.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Office.Uc">
-      <HintPath>SDK\Microsoft.Office.Uc.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -60,6 +56,11 @@
       <Project>{3e5342dd-762e-41cf-9371-fb612c278d47}</Project>
       <Name>StateLightPluginDef</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Microsoft.Office.Uc.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
