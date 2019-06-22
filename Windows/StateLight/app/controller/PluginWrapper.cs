@@ -70,10 +70,17 @@ namespace StateLight.app.controller
 				{
 					if (metadata.Attributes["name"].InnerText == "description")
 					{
-						FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(filePath);
-						if (versionInfo.FileDescription == metadata.InnerText)
+						try
 						{
-							enabled = true;
+							FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(filePath);
+							if (versionInfo.FileDescription == metadata.InnerText)
+							{
+								enabled = true;
+							}
+						}
+						catch (Exception e)
+						{
+							Console.WriteLine("Exception checking lync version: " + e.ToString());
 						}
 					}
 				}

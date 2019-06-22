@@ -107,7 +107,11 @@
   <ItemGroup>
     <Content Include="icon.ico" />
     <Content Include="PluginDeploy\Lync2010\plugin.xml" />
+    <Content Include="PluginDeploy\Lync2013\plugin.xml" />
     <Content Include="Plugin\Lync2010\plugin.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Plugin\Lync2013\plugin.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -124,8 +128,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Plugin\Lync2013\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
