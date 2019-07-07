@@ -1,0 +1,3 @@
+[submodule "Firmware/framework"]
+	path = Firmware/framework
+	url = https://github.com/Blinkinlabs/ch554_sdcc.git
