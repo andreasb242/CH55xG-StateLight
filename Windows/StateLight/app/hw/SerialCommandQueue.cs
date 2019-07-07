@@ -151,7 +151,15 @@ namespace StateLight.app.hw
 			}
 			catch (Exception ex)
 			{
-				port.Close();
+				try
+				{
+					port.Close();
+				}
+				catch (Exception ex2)
+				{
+					Console.WriteLine("Close failed");
+					Console.WriteLine(ex2.ToString());
+				}
 				Console.WriteLine("Kommunikationsfehler");
 				Console.WriteLine(ex.ToString());
 

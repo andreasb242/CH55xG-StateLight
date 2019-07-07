@@ -70,10 +70,17 @@ namespace StateLight.app.controller
 				{
 					if (metadata.Attributes["name"].InnerText == "description")
 					{
-						FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(filePath);
-						if (versionInfo.FileDescription == metadata.InnerText)
+						try
 						{
-							enabled = true;
+							FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(filePath);
+							if (versionInfo.FileDescription == metadata.InnerText)
+							{
+								enabled = true;
+							}
+						}
+						catch (Exception e)
+						{
+							Console.WriteLine("Exception checking lync version: " + e.ToString());
 						}
 					}
 				}
@@ -113,7 +120,9 @@ namespace StateLight.app.controller
 		{
 			string[] tokens = e.Name.Split(",".ToCharArray());
 			System.Diagnostics.Debug.WriteLine("Resolving: " + e.Name);
-			return Assembly.LoadFile(Path.Combine(new string[] { dllLoadingPath, tokens[0] + ".dll" }));
+			string fullPath = Path.Combine(new string[] { dllLoadingPath, tokens[0] + ".dll" });
+			System.Diagnostics.Debug.WriteLine("Path: " + fullPath);
+			return Assembly.LoadFile(fullPath);
 		}
 
 		/// <summary>

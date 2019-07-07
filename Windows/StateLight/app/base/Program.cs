@@ -6,6 +6,8 @@ using System.Windows.Forms;
 using System.IO;
 using System.Globalization;
 using System.Threading;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace StateLight
 {
@@ -51,6 +53,8 @@ namespace StateLight
 
 
 				Console.WriteLine("** Startup **");
+				Console.WriteLine("Version " + FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
+
 				Console.WriteLine(DateTime.Now.ToString(new CultureInfo("de-DE")));
 
 				Application.EnableVisualStyles();
